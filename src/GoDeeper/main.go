@@ -1,32 +1,82 @@
 package main
 
 import (
-	"os"
+	"runtime"
+	"time"
 
-	"github.com/therecipe/qt/core"
-	"github.com/therecipe/qt/widgets"
+	"github.com/go-gl/gl/v2.1/gl"
+	"github.com/go-gl/glfw/v3.1/glfw"
+
+	"GoDeeper/gui"
 )
 
+type Square gui.Square
+type P gui.Point
+
+
+var window *glfw.Window
+
+
+func init() {
+	runtime.LockOSThread()
+}
+
+func checkErr(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+const (
+ W = 42
+ H = 42
+)
+
+
+func keyPress(w *glfw.Window, k glfw.Key, s int, act glfw.Action, mods glfw.ModifierKey) {
+	// TODO: impl
+}
+
+func update() {
+
+}
+
+type pixel struct {
+	r, g, b int
+}
+
+var slice []pixel
+
+
 func main() {
-	widgets.NewQApplication(len(os.Args), os.Args)
+	//iniGame()
+	var err error
+	err = glfw.Init()
+	checkErr(err)
+	defer glfw.Terminate()
+	glfw.WindowHint(glfw.Resizable, glfw.False)
+	window, err = glfw.CreateWindow(W, H, "GoDeeper", nil, nil)
+	checkErr(err)
+	window.MakeContextCurrent()
+	window.SetKeyCallback(keyPress)
+	err = gl.Init()
+	checkErr(err)
 
-	//create a button and connect the clicked signal
-	var button = widgets.NewQPushButton2("Click me!", nil)
-	button.ConnectClicked(func(flag bool) {
-		widgets.QMessageBox_Information(nil, "OK", "You clicked me yeah!", widgets.QMessageBox__Ok, widgets.QMessageBox__Ok)
-	})
+	ticker := time.NewTicker(time.Millisecond * 500)
+	go func() {
+		for range ticker.C {
+			update()
+		}
+	}()
 
-	//create a layout and add the button
-	var layout = widgets.NewQVBoxLayout()
-	layout.AddWidget(button, 0, core.Qt__AlignCenter)
-
-	//create a window, add the layout and show the window
-	var window = widgets.NewQMainWindow(nil, 0)
-	window.SetWindowTitle("Hello World Example")
-	window.SetMinimumSize2(200, 200)
-	window.Layout().DestroyQObject()
-	window.SetLayout(layout)
-	window.Show()
-
-	widgets.QApplication_Exec()
+	gl.Ortho(0, W, H, 0, -1 ,1)
+	gl.Enable(gl.DEPTH_TEST)
+	gl.DepthFunc(gl.LESS)
+	gl.ClearColor(255,255,255,0)
+	gl.LineWidth(1)
+	gl.Color3f(1,0,0)
+	for !window.ShouldClose() {
+		gui.DrawScene(window)
+		glfw.PollEvents()
+	}
 }
