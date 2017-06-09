@@ -13,6 +13,11 @@ Install Qt
   > ./qt-opensource-linux-x64-android-5.8.0.run
 ```
 
+Debian/Ubuntu
+```bash
+  > sudo apt-get -y install build-essential libgl1-mesa-dev
+```
+
 Install Go Bindings
 ```bash
   > go get -v github.com/therecipe/qt/cmd/...
