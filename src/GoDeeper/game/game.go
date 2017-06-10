@@ -15,6 +15,8 @@ const MAX_N_BADGERS int = 10
 const BADGER_MAX_VERTICAL_WAY = 50
 const BADGER_STEP_SIZE int = 10
 
+const N_INIT_FREEZING_CYCLES = 5
+
 const MSG_GOPHER_PIPE string = "Gopher hit a pipe!"
 const MSG_GOPHER_GRILLED string = "Gopher got grilled!"
 const MSG_GOPHER_DROWNED string = "Gopher drowned!"
@@ -408,16 +410,20 @@ func GetEventChan() *chan *GopherCollision {
 	return &viewEventChan
 }
 
+var init_freezing_counter = N_INIT_FREEZING_CYCLES
+
 func Update(dt time.Duration) {
 	//Drags the board up
-	for i := 0; i < BOARD_HEIGHT - 2; i++ {
-		board.array[i] = board.array[i+1]
+	if init_freezing_counter > 0 {
+		init_freezing_counter -= 1
+	} else {
+		newRow, containsBarrier := genRandRow(board.offsetLastBarrier)
+		board.addRow(newRow, containsBarrier)
+		board.gopherRow--
+		if board.gopherRow < 0 {
+			viewEventChan <- &GopherCollision{"Gopher got dragged outside!",
+																				board.gopherRow, board.gopherCol}
+		}
 	}
-	newRow, containsBarrier := genRandRow(board.offsetLastBarrier)
-	board.addRow(newRow, containsBarrier)
-	board.gopherRow--
-	if board.gopherRow < 0 {
-		viewEventChan <- &GopherCollision{"Gopher got dragged outside!",
-			board.gopherRow, board.gopherCol}
-	}
+
 }
