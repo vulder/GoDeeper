@@ -9,12 +9,12 @@ import (
 const BOARD_HEIGHT int = 50
 const BOARD_WIDTH int = 100
 const BARRIERS_MIN_ROWS_BETWEEN int = 5
-const P_BARRIER float32 = 0.7
-const P_SWITCH_BARRIER float32 = 0.6
+const P_ROW_HAS_BARRIER float32 = 0.7
+const P_PLACE_BARRIER float32 = 0.3
 const P_NEW_BADGER float32 = 0.20
 const MAX_N_BADGERS int = 30
-const BADGER_MAX_VERTICAL_WAY = 50
-const BADGER_STEP_SIZE int = 20
+const BADGER_MAX_VERTICAL_WAY = 100
+const BADGER_STEP_SIZE int = 3
 
 const N_INIT_FREEZING_CYCLES = 5
 
@@ -357,33 +357,39 @@ func genRandRow(offsetLastBarrier int) ([]int, bool) {
 		row[j] = Earth
 	}
 
-	containsBarrier := offsetLastBarrier >= BARRIERS_MIN_ROWS_BETWEEN && rand.Float32() <= P_BARRIER
+	containsBarrier := offsetLastBarrier >= BARRIERS_MIN_ROWS_BETWEEN && rand.Float32() <= P_ROW_HAS_BARRIER
 
 	if containsBarrier {
 		barrierHoleLeft := rand.Intn(BOARD_WIDTH)
 		barrierHoleRight := barrierHoleLeft + rand.Intn(BOARD_WIDTH-barrierHoleLeft)
+
+		var currBarrierLen int = 0
+		var currBarrierType int = Pipe
+
 		for j := 0; j < BOARD_WIDTH; j++ {
-			var generateBarrier bool = false
-			var currBarrierType int
+			if j >= barrierHoleLeft && j <= barrierHoleRight {
+				currBarrierLen = 0
+				row[j] = Earth
+				continue
+			}
 
-			if rand.Float32() <= P_SWITCH_BARRIER {
-				generateBarrier = !generateBarrier
-
-				if generateBarrier {
-					switch rand.Intn(3) {
-					case 0:
-						currBarrierType = Pipe
-					case 1:
-						currBarrierType = Water
-					case 2:
-						currBarrierType = Power
-					}
+			if currBarrierLen == 0 && rand.Float32() <= P_PLACE_BARRIER {
+				currBarrierLen = rand.Intn(BOARD_WIDTH / 4)
+				switch rand.Intn(3) {
+				case 0:
+					currBarrierType = Pipe
+				case 1:
+					currBarrierType = Water
+				case 2:
+					currBarrierType = Power
 				}
 			}
-			if j >= barrierHoleLeft && j <= barrierHoleRight {
-				row[j] = Earth
-			} else if generateBarrier {
+
+			if currBarrierLen > 0 {
 				row[j] = currBarrierType
+				currBarrierLen -= 1
+			} else {
+				row[j] = Earth
 			}
 		}
 	}
