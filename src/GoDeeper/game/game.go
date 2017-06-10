@@ -49,11 +49,11 @@ type GameBoard struct {
 	offsetLastBarrier int
 }
 
-func (board GameBoard) GetCell(row, col int) int {
+func (board *GameBoard) GetCell(row, col int) int {
 	return board.array[row][col]
 }
 
-func (board GameBoard) addRow(row []int, hasBarrier bool) {
+func (board *GameBoard) addRow(newRow []int, hasBarrier bool) {
 	for row := 0; row < BOARD_HEIGHT-1; row++ {
 		for col := 0; col < BOARD_WIDTH; col++ {
 			board.array[row][col] = board.array[row+1][col]
@@ -61,7 +61,7 @@ func (board GameBoard) addRow(row []int, hasBarrier bool) {
 	}
 
 	for col := 0; col < BOARD_WIDTH; col++ {
-		board.array[BOARD_HEIGHT-1][col] = row[col]
+		board.array[BOARD_HEIGHT-1][col] = newRow[col]
 	}
 
 	if hasBarrier {
@@ -77,7 +77,7 @@ type GopherCollision struct {
 	col int
 }
 
-func (board GameBoard) moveGopher(row, col int) *GopherCollision {
+func (board *GameBoard) moveGopher(row, col int) *GopherCollision {
 	switch board.array[row][col] {
 	case Pipe:
 		return &GopherCollision{"Gopher hit a pipe!", row, col }
