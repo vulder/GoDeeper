@@ -127,8 +127,8 @@ func (board *GameBoard) moveGopher(row, col int) *GopherCollision {
 		case Enemy:
 			return &GopherCollision{MSG_NOM_NOM, row, col }
 		case Wormwhole:
-			var spots []int = getWhormwholesInRow(board.gopherRow)
-			board.array[board.gopherRow][board.gopherCol] = Tunnel
+			var spots []int = getWhormwholesInRow(row)
+			board.array[row][col] = Tunnel
 			board.gopherCol = col
 			if col == spots[0] {
 				col = spots[1]
