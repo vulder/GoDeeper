@@ -72,6 +72,10 @@ func drawBoard() {
 				break
 			case game.SuperPowerFood:
 				DrawSuperPowerFood(sx, sy)
+        break
+      case game.Wormwhole:
+				DrawWormwhole(sx, sy)
+				break
 			}
 			DrawErr(sx, sy)
 		}
