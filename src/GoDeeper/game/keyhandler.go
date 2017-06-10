@@ -37,10 +37,10 @@ func checkNarrowPassage() {
 
 	getsBonus := false
 
-	if col == 0 && (isBorder(row, col + 1) || isBorder(row, col + 2)) {
-		getsBonus = true
-	} else if col == BOARD_WIDTH - 1 && (isBorder(row, col - 1) || isBorder(row, col - 2)) {
-		getsBonus = true
+	if col == 0 {
+		getsBonus = isBorder(row, col + 1) || isBorder(row, col + 2)
+	} else if col == BOARD_WIDTH - 1 {
+		getsBonus = isBorder(row, col - 1) || isBorder(row, col - 2)
 	} else {
 		getsBonus = (col > 1 && isBorder(row, col - 2) && isBorder(row, col + 1)) ||
 				        (isBorder(row, col - 1) && isBorder(row, col + 1)) ||
