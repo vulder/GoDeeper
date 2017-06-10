@@ -2,7 +2,6 @@ package game
 
 import (
 	"math/rand"
-	"fmt"
 )
 
 const BOARD_HEIGHT int = 100
