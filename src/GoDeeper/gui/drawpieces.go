@@ -15,7 +15,7 @@ var colorMap = map[int]rgb{
 	game.Power: rgb{255,247,0},
 	game.Water: rgb{47,172,250},
 	game.Enemy: rgb{0,0,0},
-	game.Wormwhole: rgb{255, 26, 255},
+	game.Wormwhole: rgb{51, 153, 102},
 }
 
 func DrawTunnel(x, y int) {

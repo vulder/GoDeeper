@@ -9,14 +9,15 @@ import (
 const BOARD_HEIGHT int = 50
 const BOARD_WIDTH int = 100
 const BARRIERS_MIN_ROWS_BETWEEN int = 5
-const P_ROW_HAS_BARRIER float32 = 0.7
-const P_PLACE_BARRIER float32 = 0.3
+const P_PLACE_BARRIER float32 = 0.7
+const P_ROW_HAS_BARRIER float32 = 0.6
+const P_WORMWHOLES float32 = 0.10
 const P_NEW_BADGER float32 = 0.20
 const MAX_N_BADGERS int = 30
 const BADGER_MAX_VERTICAL_WAY = 100
 const BADGER_STEP_SIZE int = 3
 
-const N_INIT_FREEZING_CYCLES = 5
+const N_INIT_FREEZING_CYCLES = 500
 
 const MSG_GOPHER_PIPE string = "Gopher hit a pipe!"
 const MSG_GOPHER_GRILLED string = "Gopher got grilled!"
@@ -124,6 +125,16 @@ func (board *GameBoard) moveGopher(row, col int) *GopherCollision {
 			return &GopherCollision{MSG_GOPHER_DROWNED, row, col }
 		case Enemy:
 			return &GopherCollision{MSG_NOM_NOM, row, col }
+		case Wormwhole:
+			var spots []int = getWhormwholesInRow(board.gopherRow)
+			board.array[board.gopherRow][board.gopherCol] = Tunnel
+			board.gopherCol = col
+			if col == spots[0] {
+				col = spots[1]
+			} else {
+				col = spots[0]
+			}
+
 		default:
 			break
 		}
@@ -341,6 +352,22 @@ func getFreeSpotsInGivenRow(row []int) []int {
 	return res
 }
 
+func getWhormwholesInRow(row int) []int {
+	return getWhormwholesInGivenRow(board.array[row])
+}
+
+func getWhormwholesInGivenRow(row []int) []int {
+	var spots [] int = make([] int, 2)
+	spotsfound := 0
+	for i:=0; i<len(row);i++ {
+		if row[i] == Wormwhole {
+			spots[spotsfound] = i
+			spotsfound++
+		}
+	}
+	return spots
+}
+
 func newBoard() GameBoard {
 	var array [][]int = make([][]int, BOARD_HEIGHT, BOARD_HEIGHT)
 	for i := 0; i < BOARD_HEIGHT; i++ {
@@ -400,7 +427,32 @@ func genRandRow(offsetLastBarrier int) ([]int, bool) {
 		}
 	}
 
+	var freeSpaces []int = getFreeSpotsInGivenRow(row)
+	if rand.Float32() <= P_WORMWHOLES && len(freeSpaces) != 1{
+		row = addWormwholes(row, freeSpaces)
+	}
+
 	return row, containsBarrier
+}
+
+func addWormwholes(row, freeSpaces []int) []int {
+	var spotOne int = 0
+	var spotTwo int = 0
+	//take the wholes that are furthest from each other if borders are in the row, else random columns
+	if len(freeSpaces)>1 {
+		spotOne = freeSpaces[0]
+		spotTwo = freeSpaces[len(freeSpaces) - 1]
+	} else {
+		// spawn the first whole inside the first third of the row
+		spotOne = rand.Intn(len(row)/3)
+		// make at least one space between the wholes
+		for spotOne < spotTwo + 1 {
+			spotTwo = rand.Intn(len(row) - 1)
+			}
+	}
+	row[spotOne] = Wormwhole
+	row[spotTwo] = Wormwhole
+	return row
 }
 
 var board GameBoard
