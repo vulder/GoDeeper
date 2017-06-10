@@ -131,7 +131,7 @@ func moveBadgerKeepLeftRight(b *Badger, horizontalStep int) *GopherCollision {
 	return nil
 }
 
-func moveBadger(b *Badger) {
+func moveBadger(b *Badger) *GopherCollision {
 	for i := 0; i < BADGER_STEP_SIZE; i++ {
 		board.array[b.currRow][b.currCol] = Tunnel
 		switch b.direction {
@@ -192,7 +192,11 @@ func moveBadger(b *Badger) {
 			}
 		}
 		board.array[b.currRow][b.currCol] = Enemy
+		if board.gopherCol == b.currCol && board.gopherRow == b.currRow {
+			return &GopherCollision{MSG_NOM_NOM, b.currRow, b.currCol}
+		}
 	}
+	return nil
 }
 
 func updateBadgers() {
