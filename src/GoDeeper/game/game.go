@@ -85,9 +85,9 @@ func (board *GameBoard) moveGopher(row, col int) *GopherCollision {
 		case Power:
 			return &GopherCollision{"Gopher got grilled!", row, col }
 		case Water:
-			return &GopherCollision{"Gopher got drowned!", row, col }
+			return &GopherCollision{"Gopher drowned!", row, col }
 		case Enemy:
-			return &GopherCollision{"Gopher meal!", row, col }
+			return &GopherCollision{"Om nom nom!", row, col }
 		default:
 			break
 		}
