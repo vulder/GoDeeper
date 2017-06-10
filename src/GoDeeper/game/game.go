@@ -25,10 +25,12 @@ const MSG_NOM_NOM string = "Om nom nom!"
 
 const MSG_GO_GO string = "Go go go!"
 const MSG_BEST_NAVIGATOR string = "Best navigator!"
+const MSG_THAT_WAS_CLOSE string = "That was close!"
 
 const SCORE_INCR_INTERVAL = 300
 const FREQ_SCORE_INCR = 10
 const NARROW_PASSAGE_REWARD = 50
+const CLOSE_TO_ENEMY_REWARD = 100
 
 const (
 	Earth  int = iota

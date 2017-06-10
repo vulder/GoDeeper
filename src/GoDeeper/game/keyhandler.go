@@ -1,6 +1,9 @@
 package game
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 func GoDown() {
 	changeBoard(board.gopherRow + 1, board.gopherCol)
@@ -25,6 +28,7 @@ func changeBoard(row int, col int) {
 	}
 
 	checkNarrowPassage()
+	checkCloseToEnemy()
 }
 
 func checkNarrowPassage() {
@@ -49,6 +53,21 @@ func checkNarrowPassage() {
 	}
 }
 
+func checkCloseToEnemy() {
+	row := board.gopherRow
+	col := board.gopherCol
+
+	getsBonus := false
+
+	for i := int(math.Max(0, float64(row - 1))); i < int(math.Min(float64(BOARD_HEIGHT), float64(row + 2))); i++ {
+		for j := int(math.Max(0, float64(col - 1))); j < int(math.Min(float64(BOARD_WIDTH), float64(col + 2))); j++ {
+			getsBonus = getsBonus || (i != j && board.GetCell(i, j) == Enemy)
+		}
+	}
+	if getsBonus {
+		fmt.Println("That was close!")
+		score += CLOSE_TO_ENEMY_REWARD
+		scoreChan <- &ScoreUpdate{MSG_THAT_WAS_CLOSE, BarelyEscaped, score, CLOSE_TO_ENEMY_REWARD}
 	}
 }
 
