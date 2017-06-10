@@ -40,7 +40,7 @@ func keyPress(w *glfw.Window, k glfw.Key, s int, act glfw.Action, mods glfw.Modi
 }
 
 func update(dt time.Duration) {
-
+	game.Update(dt)
 }
 
 type pixel struct {
