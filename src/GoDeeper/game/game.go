@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"time"
 	"strconv"
+	"fmt"
 )
 
 const BOARD_HEIGHT int = 50
@@ -439,16 +440,20 @@ func addWormwholes(row, freeSpaces []int) []int {
 	var spotOne int = 0
 	var spotTwo int = 0
 	//take the wholes that are furthest from each other if borders are in the row, else random columns
-	if len(freeSpaces)>1 {
+	if len(freeSpaces) < len(row) {
 		spotOne = freeSpaces[0]
 		spotTwo = freeSpaces[len(freeSpaces) - 1]
-	} else {
-		// spawn the first whole inside the first third of the row
-		spotOne = rand.Intn(len(row)/3)
+	} else if len(freeSpaces) == BOARD_WIDTH{
+		// spawn the first whole inside the first half of the row
+		spotOne = rand.Intn(BOARD_WIDTH/3)
+		fmt.Println("0: " ,spotOne)
 		// make at least one space between the wholes
-		for spotOne < spotTwo + 1 {
-			spotTwo = rand.Intn(len(row) - 1)
+		for i:=0; i<1; i++{
+			spotTwo = rand.Intn(BOARD_WIDTH)
+			if spotTwo - BOARD_WIDTH/3 > spotOne {
+				i--
 			}
+		}
 	}
 	row[spotOne] = Wormwhole
 	row[spotTwo] = Wormwhole
