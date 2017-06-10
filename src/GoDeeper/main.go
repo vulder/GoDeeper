@@ -25,7 +25,18 @@ func checkErr(e error) {
 }
 
 func keyPress(w *glfw.Window, k glfw.Key, s int, act glfw.Action, mods glfw.ModifierKey) {
-	// TODO: impl
+	if act == glfw.Press {
+		switch k {
+		case glfw.KeyDown:
+			game.GoDown()
+		case glfw.KeyRight:
+			game.GoRight()
+		case glfw.KeyUp:
+			game.GoUp()
+		case glfw.KeyLeft:
+			game.GoLeft()
+		}
+	}
 }
 
 func update() {
