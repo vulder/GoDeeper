@@ -95,8 +95,15 @@ func main() {
 		gl.Viewport(0, 0, int32(width), int32(height))
 	})
 
-	w := int32(gui.GetWidth())
-	h := int32(gui.GetHigh())
+	gui.LoadTextures()
+
+	gl.Enable(gl.LIGHTING)
+	ambient := []float32{0.5, 0.5, 0.5, 1}
+	lightPosition := []float32{5, 5, 10, 0}
+	gl.Lightfv(gl.LIGHT0, gl.AMBIENT, &ambient[0])
+	gl.Lightfv(gl.LIGHT0, gl.POSITION, &lightPosition[0])
+	gl.Enable(gl.LIGHT0)
+	gl.Disable(gl.LIGHTING)
 
 	game.Init()
 
@@ -104,4 +111,6 @@ func main() {
 		gui.DrawScene(window)
 		glfw.PollEvents()
 	}
+
+	gui.FreeTextures()
 }

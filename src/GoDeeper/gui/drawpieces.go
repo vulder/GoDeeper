@@ -19,12 +19,16 @@ var colorMap = map[int]rgb{
 	game.Wormwhole: rgb{51, 153, 102},
 }
 
+func DrawGopher(x, y int) {
+	DrawTextureTS(x, y, Gopher)
+}
+
 func DrawTunnel(x, y int) {
-	NewSquareTS(x, y, colorMap[game.Tunnel]).Draw()
+	DrawTextureTS(x, y, Tunnel)
 }
 
 func DrawEarth(x, y int) {
-	NewSquareTS(x, y, colorMap[game.Earth]).Draw()
+	DrawTextureTS(x, y, Earth1)
 }
 
 func DrawPipe(x, y int) {
@@ -36,11 +40,11 @@ func DrawPower(x, y int) {
 }
 
 func DrawWater(x, y int) {
-	NewSquareTS(x, y, colorMap[game.Water]).Draw()
+	DrawTextureTS(x,y,Water)
 }
 
 func DrawEnemy(x, y int) {
-	NewSquareTS(x, y, colorMap[game.Enemy]).Draw()
+	DrawTextureTS(x, y, Badger)
 }
 
 func DrawWormwhole(x, y int) {

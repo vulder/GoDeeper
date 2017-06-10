@@ -58,6 +58,9 @@ func drawBoard() {
 			case game.Tunnel:
 				DrawTunnel(sx, sy)
 				break
+			case game.Gopher:
+				DrawGopher(sx, sy)
+				break
 			case game.Pipe:
 				DrawPipe(sx, sy)
 				break
