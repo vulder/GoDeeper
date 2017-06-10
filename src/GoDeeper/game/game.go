@@ -2,6 +2,7 @@ package game
 
 import (
 	"math/rand"
+	"time"
 )
 
 const BOARD_HEIGHT int = 50
@@ -331,6 +332,16 @@ func GetEventChan() *chan *GopherCollision {
 	return &viewEventChan
 }
 
-func Update() {
-
+func Update(dt time.Duration) {
+	//Drags the board up
+	for i := 0; i < BOARD_HEIGHT - 2; i++ {
+		board.array[i] = board.array[i+1]
+	}
+	newRow, containsBarrier := genRandRow(board.offsetLastBarrier)
+	board.addRow(newRow, containsBarrier)
+	board.gopherRow--
+	if board.gopherRow < 0 {
+		viewEventChan <- &GopherCollision{"Gopher got dragged outside!",
+			board.gopherRow, board.gopherCol}
+	}
 }
