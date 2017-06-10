@@ -8,15 +8,15 @@ import (
 )
 
 const BOARD_HEIGHT int = 50
-const BOARD_WIDTH int = 100
+const BOARD_WIDTH int = 25
 const BARRIERS_MIN_ROWS_BETWEEN int = 5
 const P_ROW_HAS_BARRIER float32 = 0.7
 const P_PLACE_BARRIER float32 = 0.3
 const P_WORMWHOLES float32 = 0.10
 const P_NEW_BADGER float32 = 0.20
-const MAX_N_BADGERS int = 30
-const BADGER_MAX_VERTICAL_WAY = 100
-const BADGER_STEP_SIZE int = 3
+const MAX_N_BADGERS int = 5
+const BADGER_MAX_VERTICAL_WAY = 40
+const BADGER_STEP_SIZE int = 2
 
 const P_SUPER_POWER_FOOD float32 = 0.07
 
@@ -458,7 +458,7 @@ func genRandRow(offsetLastBarrier int) ([]int, bool) {
 			}
 
 			if currBarrierLen == 0 && rand.Float32() <= P_PLACE_BARRIER {
-				currBarrierLen = rand.Intn(BOARD_WIDTH / 4)
+				currBarrierLen = rand.Intn(BOARD_WIDTH / 2)
 				switch rand.Intn(3) {
 				case 0:
 					currBarrierType = Pipe
