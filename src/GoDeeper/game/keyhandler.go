@@ -41,7 +41,7 @@ func changeBoard(row int, col int) {
 }
 
 func checkForCellKind(row int, col int, kind int) bool {
-	return row >= 0 && row < BOARD_HEIGHT && col >= 0 && col <= BOARD_WIDTH && board.GetCell(row, col) == SuperPowerFood
+	return row >= 0 && row < BOARD_HEIGHT && col >= 0 && col < BOARD_WIDTH && board.GetCell(row, col) == SuperPowerFood
 }
 
 func checkNarrowPassage() {
