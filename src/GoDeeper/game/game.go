@@ -331,14 +331,14 @@ func updateBadgers() *GopherCollision {
 }
 
 func getFreeSpotsInRow(row int) []int {
-	return getFreeSpotsInGivenRow(board.array[row])
+	return getFreeSpotsInGivenRow(&board.array[row])
 }
 
-func getFreeSpotsInGivenRow(row []int) []int {
+func getFreeSpotsInGivenRow(row *[]int) []int {
 	nSpots := 0
 
 	for i := 0; i < BOARD_WIDTH; i++ {
-		switch row[i] {
+		switch (*row)[i] {
 		case Tunnel, Earth:
 			nSpots += 1
 		default:
@@ -349,7 +349,7 @@ func getFreeSpotsInGivenRow(row []int) []int {
 
 	cnt := 0
 	for i := 0; i < BOARD_WIDTH; i++ {
-		switch row[i] {
+		switch (*row)[i] {
 		case Tunnel, Earth:
 			res[cnt] = i
 			cnt += 1
