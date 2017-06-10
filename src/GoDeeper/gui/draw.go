@@ -70,6 +70,8 @@ func drawBoard() {
 			case game.Enemy:
 				DrawEnemy(sx, sy)
 				break
+			case game.SuperPowerFood:
+				DrawSuperPowerFood(sx, sy)
 			}
 			DrawErr(sx, sy)
 		}

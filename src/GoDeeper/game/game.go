@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"time"
 	"strconv"
+	"fmt"
 )
 
 const BOARD_HEIGHT int = 50
@@ -15,6 +16,8 @@ const P_NEW_BADGER float32 = 0.20
 const MAX_N_BADGERS int = 30
 const BADGER_MAX_VERTICAL_WAY = 100
 const BADGER_STEP_SIZE int = 3
+
+const P_SUPER_POWER_FOOD float32 = 0.1
 
 const N_INIT_FREEZING_CYCLES = 5
 
@@ -32,14 +35,18 @@ const FREQ_SCORE_INCR = 10
 const NARROW_PASSAGE_REWARD = 50
 const CLOSE_TO_ENEMY_REWARD = 100
 
+const GOPHER_SUPER_POWER_DURATION = 30
+
 const (
-	Earth  int = iota
-	Tunnel int = iota
-	Gopher int = iota
-	Pipe   int = iota
-	Power  int = iota
-	Water  int = iota
-	Enemy  int = iota
+	Earth            int = iota
+	Tunnel           int = iota
+	Gopher           int = iota
+	GopherSuperPower int = iota
+	Pipe             int = iota
+	Power            int = iota
+	Water            int = iota
+	Enemy            int = iota
+	SuperPowerFood   int = iota
 )
 
 const (
@@ -97,13 +104,26 @@ func (b *Badger) String() string {
 
 var badgers []*Badger = make([]*Badger, MAX_N_BADGERS, MAX_N_BADGERS)
 
+func deleteBadgersAt(row, col int) {
+	for i := 0; i < len(badgers); i++ {
+		var b *Badger = badgers[i]
+		if b != nil && b.currCol == col && b.currRow == row {
+			fmt.Println("Killed badger")
+			badgers[i] = nil
+			board.array[row][col] = Earth
+			currNBadgers -= 1
+		}
+	}
+}
+
 var currNBadgers int = 0
 
 type GameBoard struct {
-	array             [][]int
-	gopherCol         int
-	gopherRow         int
-	offsetLastBarrier int
+	array                      [][]int
+	gopherCol                  int
+	gopherRow                  int
+	offsetLastBarrier          int
+	gopherSuperPowerCycleCount int
 }
 
 func (board *GameBoard) GetCell(row, col int) int {
@@ -149,7 +169,11 @@ func (board *GameBoard) moveGopher(row, col int) *GopherCollision {
 			break
 		}
 		board.array[board.gopherRow][board.gopherCol] = Tunnel
-		board.array[row][col] = Gopher
+		if board.gopherSuperPowerCycleCount > 0 {
+			board.array[row][col] = GopherSuperPower
+		} else {
+			board.array[row][col] = Gopher
+		}
 		board.gopherRow = row
 		board.gopherCol = col
 	}
@@ -161,7 +185,7 @@ func moveBadgerKeepLeftRight(b *Badger, horizontalStep int) *GopherCollision {
 		board.array[b.currRow][b.currCol] = Tunnel
 		if b.currCol+horizontalStep >= 0 && b.currCol+horizontalStep < BOARD_WIDTH {
 			switch board.GetCell(b.currRow, b.currCol+horizontalStep) {
-			case Tunnel, Earth, Gopher, Enemy:
+			case Tunnel, Earth, Gopher, GopherSuperPower, Enemy:
 				b.currCol = b.currCol + horizontalStep
 
 			default:
@@ -186,7 +210,7 @@ func moveBadger(b *Badger) *GopherCollision {
 		case down:
 			if b.currRow < BOARD_HEIGHT-1 {
 				switch board.array[b.currRow+1][b.currCol] {
-				case Gopher, Enemy, Tunnel, Earth:
+				case Gopher, GopherSuperPower, Enemy, Tunnel, Earth:
 					b.currRow += 1
 					b.remainingRowsDownward -= 1
 				default:
@@ -205,7 +229,7 @@ func moveBadger(b *Badger) *GopherCollision {
 				i -= 1
 			}
 			switch board.array[b.currRow+1][b.currCol] {
-			case Tunnel, Earth, Enemy, Gopher:
+			case Tunnel, Earth, Enemy, Gopher, GopherSuperPower:
 				b.direction = down
 				i -= 1
 			default:
@@ -220,7 +244,7 @@ func moveBadger(b *Badger) *GopherCollision {
 				i -= 1
 			}
 			switch board.array[b.currRow+1][b.currCol] {
-			case Tunnel, Earth, Enemy, Gopher:
+			case Tunnel, Earth, Enemy, Gopher, GopherSuperPower:
 				b.direction = down
 				i -= 1
 			default:
@@ -366,7 +390,8 @@ func newBoard() GameBoard {
 	for i := 0; i < BOARD_HEIGHT; i++ {
 		array[i] = make([]int, BOARD_WIDTH, BOARD_WIDTH)
 	}
-	board := GameBoard{array, 0, 0, BARRIERS_MIN_ROWS_BETWEEN - 1 }
+	board := GameBoard{array, 0, 0, BARRIERS_MIN_ROWS_BETWEEN - 1,
+										 0 }
 
 	for row := 0; row < BOARD_HEIGHT; row++ {
 		newRow, containsBarrier := genRandRow(board.offsetLastBarrier)
@@ -417,6 +442,15 @@ func genRandRow(offsetLastBarrier int) ([]int, bool) {
 			} else {
 				row[j] = Earth
 			}
+		}
+	}
+
+	// place special food
+	if rand.Float32() <= P_SUPER_POWER_FOOD {
+		var freeSpots []int = getFreeSpotsInGivenRow(&row)
+		if len(freeSpots) > 0 {
+			pos := freeSpots[rand.Intn(len(freeSpots))]
+			row[pos] = SuperPowerFood
 		}
 	}
 
@@ -491,5 +525,12 @@ func Update(dt time.Duration) {
 		score_incr_counter = 0
 		score += FREQ_SCORE_INCR
 		scoreChan <- &ScoreUpdate{MSG_GO_GO, RegularBonus, score, FREQ_SCORE_INCR }
+	}
+
+	if board.gopherSuperPowerCycleCount > 0 {
+		board.gopherSuperPowerCycleCount -= 1
+	}
+	if board.gopherSuperPowerCycleCount > 0 {
+		deleteBadgersAt(board.gopherRow, board.gopherCol)
 	}
 }
