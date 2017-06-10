@@ -9,6 +9,7 @@ import (
 
 	"GoDeeper/gui"
 	"fmt"
+	"GoDeeper/game"
 )
 
 var window *glfw.Window
@@ -78,6 +79,8 @@ func main() {
 
 	w := int32(gui.GetWidth())
 	h := int32(gui.GetHigh())
+
+	game.Init()
 
 	for !window.ShouldClose() {
 		gui.DrawScene(window, w, h)
