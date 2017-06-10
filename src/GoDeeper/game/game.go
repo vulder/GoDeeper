@@ -31,6 +31,7 @@ const (
 	Power  int = iota
 	Water  int = iota
 	Enemy  int = iota
+	Wormwhole int = iota
 )
 
 const (

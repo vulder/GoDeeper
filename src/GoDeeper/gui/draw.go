@@ -70,6 +70,9 @@ func drawBoard() {
 			case game.Enemy:
 				DrawEnemy(sx, sy)
 				break
+			case game.Wormwhole:
+				DrawWormwhole(sx, sy)
+				break
 			}
 			DrawErr(sx, sy)
 		}
