@@ -247,7 +247,6 @@ func updateBadgers() {
 		}
 
 		// maybe generate new badger
-		var nNewBadgers int =
 
 	}
 }
