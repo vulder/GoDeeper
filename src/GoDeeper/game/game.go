@@ -28,7 +28,7 @@ const MSG_BEST_NAVIGATOR string = "Best navigator!"
 
 const SCORE_INCR_INTERVAL = 300
 const FREQ_SCORE_INCR = 10
-const NARROW_PASSAGE_UPDATE = 50
+const NARROW_PASSAGE_REWARD = 50
 
 const (
 	Earth  int = iota

@@ -44,8 +44,11 @@ func checkNarrowPassage() {
 	}
 	if getsBonus {
 		fmt.Println("Narrow Passage!")
-		score += NARROW_PASSAGE_UPDATE
-		scoreChan <- &ScoreUpdate{ MSG_BEST_NAVIGATOR, PassedNarrowPassage, score, NARROW_PASSAGE_UPDATE }
+		score += NARROW_PASSAGE_REWARD
+		scoreChan <- &ScoreUpdate{MSG_BEST_NAVIGATOR, PassedNarrowPassage, score, NARROW_PASSAGE_REWARD }
+	}
+}
+
 	}
 }
 
