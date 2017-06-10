@@ -2,13 +2,13 @@ package game
 
 import (
 	"math/rand"
+	"fmt"
 )
 
 const BOARD_HEIGHT int = 100
 const BOARD_WIDTH int = 200
-const MAX_RAND_ROWS_AT_ONCE int = 10
 const BARRIERS_MIN_ROWS_BETWEEN int = 2
-const P_BARRIER float32 = 0.3
+const P_BARRIER float32 = 0.7
 const P_NEW_BADGER float32 = 0.05
 const MAX_N_BADGERS int = 10
 const BADGER_STEP_SIZE int = 10
