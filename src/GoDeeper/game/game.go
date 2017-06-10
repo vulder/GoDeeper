@@ -77,16 +77,16 @@ type GopherCollision struct {
 	col int
 }
 
-func (board GameBoard) moveGopher(row, col int) GopherCollision {
+func (board GameBoard) moveGopher(row, col int) *GopherCollision {
 	switch board.array[row][col] {
 	case Pipe:
-		return GopherCollision{"Gopher hit a pipe!", row, col }
+		return &GopherCollision{"Gopher hit a pipe!", row, col }
 	case Power:
-		return GopherCollision{"Gopher got grilled!", row, col }
+		return &GopherCollision{"Gopher got grilled!", row, col }
 	case Water:
-		return GopherCollision{"Gopher got drowned!", row, col }
+		return &GopherCollision{"Gopher got drowned!", row, col }
 	case Enemy:
-		return GopherCollision{"Gopher meal!", row, col }
+		return &GopherCollision{"Gopher meal!", row, col }
 	default:
 		break
 	}
@@ -100,7 +100,7 @@ func (board GameBoard) moveGopher(row, col int) GopherCollision {
 func moveBadgerKeepLeftRight(b *Badger, horizontalStep int) {
 	for i := 0; i < BADGER_STEP_SIZE; i++ {
 		board.array[b.currRow][b.currCol] = Tunnel
-		switch (board.GetCell(b.currRow, b.currCol + horizontalStep)) {
+		switch board.GetCell(b.currRow, b.currCol + horizontalStep) {
 		case Tunnel:
 		case Earth:
 			b.currCol = b.currCol + horizontalStep
@@ -121,7 +121,7 @@ func moveBadger(b *Badger) {
 		switch b.direction {
 		case down:
 			if b.currRow < BOARD_HEIGHT - 1 {
-				switch (board.array[b.currRow + 1][b.currCol]) {
+				switch board.array[b.currRow + 1][b.currCol] {
 				case Earth:
 				case Tunnel:
 					b.currRow += 1
