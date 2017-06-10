@@ -11,6 +11,7 @@ const P_BARRIER float32 = 0.7
 const P_SWITCH_BARRIER float32 = 0.6
 const P_NEW_BADGER float32 = 0.05
 const MAX_N_BADGERS int = 10
+const BADGER_MAX_VERTICAL_WAY = 50
 const BADGER_STEP_SIZE int = 10
 
 const (
@@ -249,8 +250,56 @@ func updateBadgers() {
 		}
 
 		// maybe generate new badger
-
+		if rand.Float32() <= P_NEW_BADGER {
+			var nNewBadgers int = rand.Intn(MAX_N_BADGERS - currNBadgers)
+			for gNum := 0; gNum < nNewBadgers; i++ {
+				var possibleStartPositions []int = getFreeSpotsInRow(0)
+				if len(possibleStartPositions) == 0 {
+					return
+				}
+				var gStartCol int = possibleStartPositions[rand.Intn(len(possibleStartPositions))]
+				var newBadger Badger = Badger{0, gStartCol,
+																			rand.Intn(BADGER_MAX_VERTICAL_WAY), down}
+				for i := 0; i < len(badgers); i++ {
+					if badgers[i] == nil {
+						badgers[i] = &newBadger
+						break
+					}
+				}
+			}
+		}
 	}
+}
+
+func getFreeSpotsInRow(row int) []int {
+	nSpots := 0
+
+	for i := 0; i < BOARD_WIDTH; i++ {
+		switch board.GetCell(row, i) {
+		case Tunnel:
+		case Earth:
+			nSpots += 1
+			break
+		default:
+			break
+		}
+	}
+	var res []int = make([]int, nSpots, nSpots)
+
+	cnt := 0
+	for i := 0; i < BOARD_WIDTH; i++ {
+		switch board.GetCell(row, i) {
+		case Tunnel:
+		case Earth:
+			res[cnt] = i
+			cnt += 1
+			break
+		default:
+			break
+		}
+	}
+
+	return res
 }
 
 func newBoard() GameBoard {
