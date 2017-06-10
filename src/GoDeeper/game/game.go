@@ -17,7 +17,7 @@ const MAX_N_BADGERS int = 30
 const BADGER_MAX_VERTICAL_WAY = 100
 const BADGER_STEP_SIZE int = 3
 
-const P_SUPER_POWER_FOOD float32 = 0.1
+const P_SUPER_POWER_FOOD float32 = 0.07
 
 const N_INIT_FREEZING_CYCLES = 5
 
@@ -110,7 +110,7 @@ func deleteBadgersAt(row, col int) {
 		if b != nil && b.currCol == col && b.currRow == row {
 			fmt.Println("Killed badger")
 			badgers[i] = nil
-			board.array[row][col] = Earth
+			board.array[row][col] = Tunnel
 			currNBadgers -= 1
 		}
 	}
