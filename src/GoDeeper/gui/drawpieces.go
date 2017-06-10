@@ -10,9 +10,15 @@ type Earth struct {
 
 var colorMap = map[int]rgb{
 	game.Earth: rgb{139,69,19},
+	game.Tunnel: rgb{102, 51, 0},
 	game.Pipe: rgb{166,163,157},
 	game.Power: rgb{255,247,0},
 	game.Water: rgb{47,172,250},
+	game.Enemy: rgb{0,0,0},
+}
+
+func DrawTunnel(x, y int) {
+	NewSquareTS(x, y, colorMap[game.Tunnel]).Draw()
 }
 
 func DrawEarth(x, y int) {
@@ -29,6 +35,10 @@ func DrawPower(x, y int) {
 
 func DrawWater(x, y int) {
 	NewSquareTS(x, y, colorMap[game.Water]).Draw()
+}
+
+func DrawEnemy(x, y int) {
+	NewSquareTS(x, y, colorMap[game.Enemy]).Draw()
 }
 
 func DrawErr(x, y int) {

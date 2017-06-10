@@ -55,6 +55,9 @@ func drawBoard() {
 			case game.Earth:
 				DrawEarth(sx, sy)
 				break
+			case game.Tunnel:
+				DrawTunnel(sx, sy)
+				break
 			case game.Pipe:
 				DrawPipe(sx, sy)
 				break
@@ -63,6 +66,9 @@ func drawBoard() {
 				break
 			case game.Water:
 				DrawWater(sx, sy)
+				break
+			case game.Enemy:
+				DrawEnemy(sx, sy)
 				break
 			}
 			DrawErr(sx, sy)
