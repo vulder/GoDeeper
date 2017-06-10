@@ -101,7 +101,7 @@ func main() {
 	game.Init()
 
 	for !window.ShouldClose() {
-		gui.DrawScene(window, w, h)
+		gui.DrawScene(window)
 		glfw.PollEvents()
 	}
 }
