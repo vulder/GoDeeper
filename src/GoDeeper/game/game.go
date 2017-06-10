@@ -410,6 +410,19 @@ func GetEventChan() *chan *GopherCollision {
 	return &viewEventChan
 }
 
+func shiftBadgers() {
+	for i := 0; i < len(badgers); i++ {
+		var b *Badger = badgers[i]
+		if b != nil {
+			b.currCol -= 1
+			if b.currCol < 0 {
+				badgers[i] = nil
+				currNBadgers -= 1
+			}
+		}
+	}
+}
+
 var init_freezing_counter = N_INIT_FREEZING_CYCLES
 
 func Update(dt time.Duration) {
@@ -420,6 +433,7 @@ func Update(dt time.Duration) {
 		newRow, containsBarrier := genRandRow(board.offsetLastBarrier)
 		board.addRow(newRow, containsBarrier)
 		board.gopherRow--
+		shiftBadgers()
 		if board.gopherRow < 0 {
 			viewEventChan <- &GopherCollision{"Gopher got dragged outside!",
 																				board.gopherRow, board.gopherCol}
