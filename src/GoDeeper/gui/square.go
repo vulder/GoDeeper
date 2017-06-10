@@ -7,7 +7,8 @@ type Square struct {
 	color rgb
 }
 
-func NewSquareTS(left, top int, color rgb) *Square {
+// TODO: this should be (left, top int)
+func NewSquareTS(top, left int, color rgb) *Square {
 	s := new(Square)
 	s.P1 = Point{left, top}
 	s.P2 = Point{left + tile_size, top}
@@ -17,7 +18,8 @@ func NewSquareTS(left, top int, color rgb) *Square {
 	return s
 }
 
-func NewSquare(left, top, w, h int, color rgb) *Square {
+// TODO: this should be (left, top int)
+func NewSquare(top, left, w, h int, color rgb) *Square {
 	s := new(Square)
 	s.P1 = Point{left, top}
 	s.P2 = Point{left + w, top}

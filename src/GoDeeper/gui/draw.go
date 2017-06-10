@@ -8,17 +8,15 @@ import (
 )
 
 const (
-	w_tiles = 200
-	h_tiles = 100
-	tile_size = 42
+	tile_size = 10
 )
 
 func GetWidth() int {
-	return w_tiles * tile_size
+	return game.BOARD_WIDTH * tile_size
 }
 
 func GetHigh() int {
-	return h_tiles * tile_size
+	return game.BOARD_HEIGHT * tile_size
 }
 
 type context struct {
@@ -29,12 +27,12 @@ var currentContext = context{}
 
 func (c context) GetWidthScale() int {
 	width, _ := c.Window.GetSize()
-	return width / w_tiles
+	return width / game.BOARD_WIDTH
 }
 
 func (c context) GetHeightScale() int {
 	_, height := c.Window.GetSize()
-	return height / h_tiles
+	return height / game.BOARD_HEIGHT
 }
 
 func DrawScene(window *glfw.Window, w int32, h int32) {
@@ -49,19 +47,25 @@ func DrawScene(window *glfw.Window, w int32, h int32) {
 
 func drawBoard() {
 	board := game.GetBoard()
-	for i := 0; i < 200; i++ {
-		for j := 0; j < 100; j++ {
+	for i := 0; i < game.BOARD_HEIGHT; i++ {
+		for j := 0; j < game.BOARD_WIDTH; j++ {
+			sx, sy := coordsToScreen(i, j)
+
 			switch board.GetCell(i, j) {
 			case game.Earth:
-				DrawEarth(coordsToScreen(i, j))
+				DrawEarth(sx, sy)
+				break
 			case game.Pipe:
-				DrawPipe(coordsToScreen(i, j))
+				DrawPipe(sx, sy)
+				break
 			case game.Power:
-				DrawPower(coordsToScreen(i, j))
+				DrawPower(sx, sy)
+				break
 			case game.Water:
-				DrawWater(coordsToScreen(i, j))
+				DrawWater(sx, sy)
+				break
 			}
-			DrawErr(i * tile_size,j * tile_size)
+			DrawErr(sx, sy)
 		}
 	}
 }
