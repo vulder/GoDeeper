@@ -10,20 +10,20 @@ const MAX_RAND_ROWS_AT_ONCE = 10
 const BARRIERS_MIN_ROWS_BETWEEN = 2
 const P_BARRIER = 0.3
 
-const(
-	Earth int = iota
+const (
+	Earth  int = iota
 	Tunnel int = iota
 	Gopher int = iota
-	Pipe int = iota
-	Power int = iota
-	Water int = iota
-	Enemy int = iota
+	Pipe   int = iota
+	Power  int = iota
+	Water  int = iota
+	Enemy  int = iota
 )
 
 type GameBoard struct {
 	array             [][]int
-	gopherX           int
-	gopherY           int
+	gopherCol         int
+	gopherRow         int
 	offsetLastBarrier int
 }
 
@@ -32,14 +32,14 @@ func (board GameBoard) GetCell(row, col int) int {
 }
 
 func (board GameBoard) addRow(row []int, hasBarrier bool) {
-	for row := 0; row < BOARD_HEIGHT - 1; row++ {
+	for row := 0; row < BOARD_HEIGHT-1; row++ {
 		for col := 0; col < BOARD_WIDTH; col++ {
-			board.array[row][col] = board.array[row + 1][col]
+			board.array[row][col] = board.array[row+1][col]
 		}
 	}
 
 	for col := 0; col < BOARD_WIDTH; col++ {
-		board.array[BOARD_HEIGHT - 1][col] = row[col]
+		board.array[BOARD_HEIGHT-1][col] = row[col]
 	}
 
 	if hasBarrier {
@@ -49,7 +49,30 @@ func (board GameBoard) addRow(row []int, hasBarrier bool) {
 	}
 }
 
-func (board GameBoard) moveGopher(x, y int) {
+type GopherCollision struct {
+	msg string
+	row int
+	col int
+}
+
+func (board GameBoard) moveGopher(row, col int) GopherCollision {
+	switch board.array[row][col] {
+	case Pipe:
+		return GopherCollision{"Gopher hit a pipe!", row, col }
+	case Power:
+		return GopherCollision{"Gopher got grilled!", row, col }
+	case Water:
+		return GopherCollision{"Gopher got drowned!", row, col }
+	case Enemy:
+		return GopherCollision{"Gopher meal!", row, col }
+	default:
+		break
+	}
+	board.array[board.gopherRow][board.gopherCol] = Tunnel
+	board.array[row][col] = Gopher
+	board.gopherRow = row
+	board.gopherCol = col
+	return nil
 }
 
 func newBoard() GameBoard {
@@ -63,6 +86,7 @@ func newBoard() GameBoard {
 		newRow, containsBarrier := genRandRow(board.offsetLastBarrier)
 		board.addRow(newRow, containsBarrier)
 	}
+	board.array[0][0] = Gopher
 	return board
 }
 
@@ -77,7 +101,7 @@ func genRandRow(offsetLastBarrier int) ([]int, bool) {
 
 	if containsBarrier {
 		barrierHoleLeft := rand.Intn(BOARD_WIDTH)
-		barrierHoleRight := barrierHoleLeft + rand.Intn(BOARD_WIDTH - barrierHoleLeft)
+		barrierHoleRight := barrierHoleLeft + rand.Intn(BOARD_WIDTH-barrierHoleLeft)
 		for j := 0; j < BOARD_WIDTH; j++ {
 			var generateBarrier bool = false
 			var currBarrierType int
