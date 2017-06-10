@@ -16,7 +16,7 @@ var colorMap = map[int]rgb{
 	game.Water: rgb{47,172,250},
 	game.Enemy: rgb{0,0,0},
 	game.SuperPowerFood: rgb{255,0,0},
-	game.Wormwhole: rgb{51, 153, 102},
+	game.Wormhole: rgb{51, 153, 102},
 }
 
 func DrawTunnel(x, y int) {
@@ -44,7 +44,7 @@ func DrawEnemy(x, y int) {
 }
 
 func DrawWormwhole(x, y int) {
-	NewSquareTS(x, y, colorMap[game.Wormwhole]).Draw()
+	NewSquareTS(x, y, colorMap[game.Wormhole]).Draw()
 }
 
 func DrawSuperPowerFood(x, y int) {
