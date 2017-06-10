@@ -48,7 +48,7 @@ const (
 	Water            int = iota
 	Enemy            int = iota
 	SuperPowerFood   int = iota
-  	Wormhole         int = iota
+	Wormhole         int = iota
 )
 
 const (
@@ -419,7 +419,7 @@ func getWormholesInRow(row int) []int {
 func getWormholesInGivenRow(row []int) []int {
 	var spots [] int = make([] int, 2)
 	spotsfound := 0
-	for i:=0; i<len(row);i++ {
+	for i := 0; i < len(row); i++ {
 		if row[i] == Wormhole {
 			spots[spotsfound] = i
 			spotsfound++
@@ -497,9 +497,9 @@ func genRandRow(offsetLastBarrier int) ([]int, bool) {
 		}
 	}
 
-  // place worm holes
-  var freeSpaces []int = getFreeSpotsInGivenRow(&row)
-	if rand.Float32() <= P_WORMHOLES && len(freeSpaces) != 1{
+	// place worm holes
+	var freeSpaces []int = getFreeSpotsInGivenRow(&row)
+	if rand.Float32() <= P_WORMHOLES && len(freeSpaces) != 1 {
 		row = addWormholes(row, freeSpaces)
 	}
 
@@ -512,15 +512,15 @@ func addWormholes(row, freeSpaces []int) []int {
 	//take the holes that are furthest from each other if borders are in the row, else random columns
 	if len(freeSpaces) < len(row) {
 		spotOne = freeSpaces[0]
-		spotTwo = freeSpaces[len(freeSpaces) - 1]
-	} else if len(freeSpaces) == BOARD_WIDTH{
+		spotTwo = freeSpaces[len(freeSpaces)-1]
+	} else if len(freeSpaces) == BOARD_WIDTH {
 		// spawn the first hole inside the first half of the row
-		spotOne = rand.Intn(BOARD_WIDTH/3)
-		fmt.Println("0: " ,spotOne)
+		spotOne = rand.Intn(BOARD_WIDTH / 3)
+		fmt.Println("0: ", spotOne)
 		// make at least one space between the holes
-		for i:=0; i<1; i++{
+		for i := 0; i < 1; i++ {
 			spotTwo = rand.Intn(BOARD_WIDTH)
-			if spotTwo - BOARD_WIDTH/3 > spotOne {
+			if spotTwo-BOARD_WIDTH/3 > spotOne {
 				i--
 			}
 		}
