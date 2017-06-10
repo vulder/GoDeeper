@@ -14,6 +14,11 @@ const MAX_N_BADGERS int = 10
 const BADGER_MAX_VERTICAL_WAY = 50
 const BADGER_STEP_SIZE int = 10
 
+const MSG_GOPHER_PIPE string = "Gopher hit a pipe!"
+const MSG_GOPHER_GRILLED string = "Gopher got grilled!"
+const MSG_GOPHER_DROWNED string = "Gopher drowned!"
+const MSG_NOM_NOM string = "Om nom nom!"
+
 const (
 	Earth  int = iota
 	Tunnel int = iota
@@ -82,13 +87,13 @@ func (board *GameBoard) moveGopher(row, col int) *GopherCollision {
 	if row >= 0 && row < BOARD_HEIGHT && col >= 0 && col < BOARD_WIDTH {
 		switch board.array[row][col] {
 		case Pipe:
-			return &GopherCollision{"Gopher hit a pipe!", row, col }
+			return &GopherCollision{MSG_GOPHER_PIPE, row, col }
 		case Power:
-			return &GopherCollision{"Gopher got grilled!", row, col }
+			return &GopherCollision{MSG_GOPHER_GRILLED, row, col }
 		case Water:
-			return &GopherCollision{"Gopher drowned!", row, col }
+			return &GopherCollision{MSG_GOPHER_DROWNED, row, col }
 		case Enemy:
-			return &GopherCollision{"Om nom nom!", row, col }
+			return &GopherCollision{MSG_NOM_NOM, row, col }
 		default:
 			break
 		}
