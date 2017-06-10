@@ -12,9 +12,9 @@ const BARRIERS_MIN_ROWS_BETWEEN int = 5
 const P_BARRIER float32 = 0.7
 const P_SWITCH_BARRIER float32 = 0.6
 const P_NEW_BADGER float32 = 0.20
-const MAX_N_BADGERS int = 10
+const MAX_N_BADGERS int = 30
 const BADGER_MAX_VERTICAL_WAY = 50
-const BADGER_STEP_SIZE int = 5
+const BADGER_STEP_SIZE int = 20
 
 const N_INIT_FREEZING_CYCLES = 5
 
