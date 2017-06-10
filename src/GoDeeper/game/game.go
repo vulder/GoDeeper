@@ -105,22 +105,30 @@ func (board *GameBoard) moveGopher(row, col int) *GopherCollision {
 	return nil
 }
 
-func moveBadgerKeepLeftRight(b *Badger, horizontalStep int) {
+func moveBadgerKeepLeftRight(b *Badger, horizontalStep int) *GopherCollision {
 	for i := 0; i < BADGER_STEP_SIZE; i++ {
 		board.array[b.currRow][b.currCol] = Tunnel
-		switch board.GetCell(b.currRow, b.currCol+horizontalStep) {
-		case Tunnel:
-		case Earth:
-			b.currCol = b.currCol + horizontalStep
-			break
-		default:
-			if b.currRow+1 < BOARD_HEIGHT-1 {
-				b.currRow = b.currRow + 1
-				b.remainingRowsDownward -= 1
+		if b.currCol+horizontalStep >= 0 && b.currCol+horizontalStep < BOARD_WIDTH {
+			switch board.GetCell(b.currRow, b.currCol+horizontalStep) {
+			case Tunnel:
+			case Earth:
+			case Gopher:
+				b.currCol = b.currCol + horizontalStep
+				break
+
+			default:
+				if b.currRow+1 < BOARD_HEIGHT-1 {
+					b.currRow = b.currRow + 1
+					b.remainingRowsDownward -= 1
+				}
 			}
 		}
 		board.array[b.currRow][b.currCol] = Enemy
+		if board.gopherCol == b.currCol && board.gopherRow == b.currRow {
+			return &GopherCollision{MSG_NOM_NOM, b.currRow, b.currCol}
+		}
 	}
+	return nil
 }
 
 func moveBadger(b *Badger) {
