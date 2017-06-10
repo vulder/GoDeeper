@@ -202,7 +202,7 @@ func moveBadgerKeepLeftRight(b *Badger, horizontalStep int) *GopherCollision {
 		board.array[b.currRow][b.currCol] = Tunnel
 		if b.currCol+horizontalStep >= 0 && b.currCol+horizontalStep < BOARD_WIDTH {
 			switch board.GetCell(b.currRow, b.currCol+horizontalStep) {
-			case Tunnel, Earth, Gopher, GopherSuperPower, Enemy:
+			case Tunnel, Earth, Gopher, GopherSuperPower, Enemy, SuperPowerFood:
 				b.currCol = b.currCol + horizontalStep
 
 			default:
@@ -227,7 +227,7 @@ func moveBadger(b *Badger) *GopherCollision {
 		case down:
 			if b.currRow < BOARD_HEIGHT-1 {
 				switch board.array[b.currRow+1][b.currCol] {
-				case Gopher, GopherSuperPower, Enemy, Tunnel, Earth:
+				case Gopher, GopherSuperPower, Enemy, Tunnel, Earth, SuperPowerFood:
 					b.currRow += 1
 					b.remainingRowsDownward -= 1
 				default:
@@ -246,7 +246,7 @@ func moveBadger(b *Badger) *GopherCollision {
 				i -= 1
 			}
 			switch board.array[b.currRow+1][b.currCol] {
-			case Tunnel, Earth, Enemy, Gopher, GopherSuperPower:
+			case Tunnel, Earth, Enemy, Gopher, GopherSuperPower, SuperPowerFood:
 				b.direction = down
 				i -= 1
 			default:
@@ -261,7 +261,7 @@ func moveBadger(b *Badger) *GopherCollision {
 				i -= 1
 			}
 			switch board.array[b.currRow+1][b.currCol] {
-			case Tunnel, Earth, Enemy, Gopher, GopherSuperPower:
+			case Tunnel, Earth, Enemy, Gopher, GopherSuperPower, SuperPowerFood:
 				b.direction = down
 				i -= 1
 			default:
