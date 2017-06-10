@@ -45,6 +45,7 @@ func mouseClicked(w *glfw.Window, button glfw.MouseButton, action glfw.Action, m
 
 func main() {
 	//iniGame()
+	game.Init()
 	var err error
 	err = glfw.Init()
 	checkErr(err)

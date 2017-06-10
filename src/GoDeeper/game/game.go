@@ -2,12 +2,14 @@ package game
 
 import (
 	"math/rand"
+	"fmt"
 )
 
-const BOARD_HEIGHT int = 100
-const BOARD_WIDTH int = 200
-const BARRIERS_MIN_ROWS_BETWEEN int = 2
+const BOARD_HEIGHT int = 50
+const BOARD_WIDTH int = 100
+const BARRIERS_MIN_ROWS_BETWEEN int = 5
 const P_BARRIER float32 = 0.7
+const P_SWITCH_BARRIER float32 = 0.6
 const P_NEW_BADGER float32 = 0.05
 const MAX_N_BADGERS int = 10
 const BADGER_STEP_SIZE int = 10
@@ -68,6 +70,14 @@ func (board *GameBoard) addRow(newRow []int, hasBarrier bool) {
 	} else {
 		board.offsetLastBarrier += 1
 	}
+
+	for i := 0; i < BOARD_HEIGHT; i++ {
+		for j := 0; j < BOARD_WIDTH; j++ {
+			fmt.Print(board.array[i][j], ", ")
+		}
+		fmt.Println()
+	}
+	fmt.Println("-------")
 }
 
 type GopherCollision struct {
@@ -259,6 +269,12 @@ func newBoard() GameBoard {
 
 	for row := 0; row < BOARD_HEIGHT; row++ {
 		newRow, containsBarrier := genRandRow(board.offsetLastBarrier)
+		fmt.Println("===")
+		for i := 0; i < BOARD_WIDTH; i++ {
+			fmt.Print(newRow[i], ", ")
+		}
+		fmt.Println()
+		fmt.Println("===")
 		board.addRow(newRow, containsBarrier)
 	}
 	board.array[0][0] = Gopher
@@ -281,7 +297,7 @@ func genRandRow(offsetLastBarrier int) ([]int, bool) {
 			var generateBarrier bool = false
 			var currBarrierType int
 
-			if rand.Float32() <= 0.3 {
+			if rand.Float32() <= P_SWITCH_BARRIER {
 				generateBarrier = !generateBarrier
 
 				if generateBarrier {
@@ -298,7 +314,7 @@ func genRandRow(offsetLastBarrier int) ([]int, bool) {
 					}
 				}
 			}
-			if j >= barrierHoleLeft || j <= barrierHoleRight {
+			if j >= barrierHoleLeft && j <= barrierHoleRight {
 				row[j] = Earth
 			} else if generateBarrier {
 				row[j] = currBarrierType
