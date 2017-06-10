@@ -10,9 +10,15 @@ const BOARD_WIDTH int = 100
 const BARRIERS_MIN_ROWS_BETWEEN int = 5
 const P_BARRIER float32 = 0.7
 const P_SWITCH_BARRIER float32 = 0.6
-const P_NEW_BADGER float32 = 0.05
+const P_NEW_BADGER float32 = 0.02
 const MAX_N_BADGERS int = 10
+const BADGER_MAX_VERTICAL_WAY = 50
 const BADGER_STEP_SIZE int = 10
+
+const MSG_GOPHER_PIPE string = "Gopher hit a pipe!"
+const MSG_GOPHER_GRILLED string = "Gopher got grilled!"
+const MSG_GOPHER_DROWNED string = "Gopher drowned!"
+const MSG_NOM_NOM string = "Om nom nom!"
 
 const (
 	Earth  int = iota
@@ -82,13 +88,13 @@ func (board *GameBoard) moveGopher(row, col int) *GopherCollision {
 	if row >= 0 && row < BOARD_HEIGHT && col >= 0 && col < BOARD_WIDTH {
 		switch board.array[row][col] {
 		case Pipe:
-			return &GopherCollision{"Gopher hit a pipe!", row, col }
+			return &GopherCollision{MSG_GOPHER_PIPE, row, col }
 		case Power:
-			return &GopherCollision{"Gopher got grilled!", row, col }
+			return &GopherCollision{MSG_GOPHER_GRILLED, row, col }
 		case Water:
-			return &GopherCollision{"Gopher drowned!", row, col }
+			return &GopherCollision{MSG_GOPHER_DROWNED, row, col }
 		case Enemy:
-			return &GopherCollision{"Om nom nom!", row, col }
+			return &GopherCollision{MSG_NOM_NOM, row, col }
 		default:
 			break
 		}
@@ -100,25 +106,33 @@ func (board *GameBoard) moveGopher(row, col int) *GopherCollision {
 	return nil
 }
 
-func moveBadgerKeepLeftRight(b *Badger, horizontalStep int) {
+func moveBadgerKeepLeftRight(b *Badger, horizontalStep int) *GopherCollision {
 	for i := 0; i < BADGER_STEP_SIZE; i++ {
 		board.array[b.currRow][b.currCol] = Tunnel
-		switch board.GetCell(b.currRow, b.currCol+horizontalStep) {
-		case Tunnel:
-		case Earth:
-			b.currCol = b.currCol + horizontalStep
-			break
-		default:
-			if b.currRow+1 < BOARD_HEIGHT-1 {
-				b.currRow = b.currRow + 1
-				b.remainingRowsDownward -= 1
+		if b.currCol+horizontalStep >= 0 && b.currCol+horizontalStep < BOARD_WIDTH {
+			switch board.GetCell(b.currRow, b.currCol+horizontalStep) {
+			case Tunnel:
+			case Earth:
+			case Gopher:
+				b.currCol = b.currCol + horizontalStep
+				break
+
+			default:
+				if b.currRow+1 < BOARD_HEIGHT-1 {
+					b.currRow = b.currRow + 1
+					b.remainingRowsDownward -= 1
+				}
 			}
 		}
 		board.array[b.currRow][b.currCol] = Enemy
+		if board.gopherCol == b.currCol && board.gopherRow == b.currRow {
+			return &GopherCollision{MSG_NOM_NOM, b.currRow, b.currCol}
+		}
 	}
+	return nil
 }
 
-func moveBadger(b *Badger) {
+func moveBadger(b *Badger) *GopherCollision {
 	for i := 0; i < BADGER_STEP_SIZE; i++ {
 		board.array[b.currRow][b.currCol] = Tunnel
 		switch b.direction {
@@ -179,10 +193,14 @@ func moveBadger(b *Badger) {
 			}
 		}
 		board.array[b.currRow][b.currCol] = Enemy
+		if board.gopherCol == b.currCol && board.gopherRow == b.currRow {
+			return &GopherCollision{MSG_NOM_NOM, b.currRow, b.currCol}
+		}
 	}
+	return nil
 }
 
-func updateBadgers() {
+func updateBadgers() *GopherCollision {
 	// delete existing badgers (if close to the edge)
 	for i := 0; i < len(badgers); i++ {
 		var b *Badger = badgers[i]
@@ -239,19 +257,77 @@ func updateBadgers() {
 		if b != nil {
 			switch b.direction {
 			case keepLeft:
-				moveBadgerKeepLeftRight(b, -1)
+				res := moveBadgerKeepLeftRight(b, -1)
+				if res != nil {
+					return res
+				}
 				break;
 			case keepRight:
-				moveBadgerKeepLeftRight(b, +1)
+				res := moveBadgerKeepLeftRight(b, +1)
+				if res != nil {
+					return res
+				}
 				break;
 			default:
-				moveBadger(b)
+				res := moveBadger(b)
+				if res != nil {
+					return res
+				}
 			}
 		}
 
 		// maybe generate new badger
-
+		if rand.Float32() <= P_NEW_BADGER {
+			var nNewBadgers int = rand.Intn(MAX_N_BADGERS - currNBadgers)
+			for gNum := 0; gNum < nNewBadgers; i++ {
+				var possibleStartPositions []int = getFreeSpotsInRow(0)
+				if len(possibleStartPositions) == 0 {
+					return nil
+				}
+				var gStartCol int = possibleStartPositions[rand.Intn(len(possibleStartPositions))]
+				var newBadger Badger = Badger{0, gStartCol,
+																			rand.Intn(BADGER_MAX_VERTICAL_WAY), down}
+				for i := 0; i < len(badgers); i++ {
+					if badgers[i] == nil {
+						badgers[i] = &newBadger
+						break
+					}
+				}
+			}
+		}
 	}
+	return nil
+}
+
+func getFreeSpotsInRow(row int) []int {
+	nSpots := 0
+
+	for i := 0; i < BOARD_WIDTH; i++ {
+		switch board.GetCell(row, i) {
+		case Tunnel:
+		case Earth:
+			nSpots += 1
+			break
+		default:
+			break
+		}
+	}
+	var res []int = make([]int, nSpots, nSpots)
+
+	cnt := 0
+	for i := 0; i < BOARD_WIDTH; i++ {
+		switch board.GetCell(row, i) {
+		case Tunnel:
+		case Earth:
+			res[cnt] = i
+			cnt += 1
+			break
+		default:
+			break
+		}
+	}
+
+	return res
 }
 
 func newBoard() GameBoard {

@@ -39,7 +39,7 @@ func keyPress(w *glfw.Window, k glfw.Key, s int, act glfw.Action, mods glfw.Modi
 	}
 }
 
-func update() {
+func update(dt time.Duration) {
 
 }
 
@@ -61,19 +61,25 @@ func main() {
 	err = glfw.Init()
 	checkErr(err)
 	defer glfw.Terminate()
+
 	glfw.WindowHint(glfw.Resizable, glfw.False)
 	window, err = glfw.CreateWindow(gui.GetWidth(), gui.GetHigh(), "GoDeeper", nil, nil)
 	checkErr(err)
 	window.MakeContextCurrent()
 	window.SetKeyCallback(keyPress)
 	window.SetMouseButtonCallback(mouseClicked)
+
 	err = gl.Init()
 	checkErr(err)
 
 	ticker := time.NewTicker(time.Millisecond * 500)
 	go func() {
+		var lastTick = time.Now()
+
 		for range ticker.C {
-			update()
+			currentTick := time.Now()
+			update(currentTick.Sub(lastTick))
+			lastTick = currentTick
 		}
 	}()
 
