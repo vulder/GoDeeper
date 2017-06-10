@@ -3,19 +3,22 @@ package gui
 import (
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.1/glfw"
+
+	"GoDeeper/game"
 )
 
 const (
-	w_tiles = 42
-	h_tiles = 42
+	w_tiles = 200
+	h_tiles = 100
+	tile_size = 42
 )
 
 func GetWidth() int {
-	return w_tiles * 10
+	return w_tiles * tile_size
 }
 
 func GetHigh() int {
-	return h_tiles * 10
+	return h_tiles * tile_size
 }
 
 type context struct {
@@ -39,27 +42,46 @@ func DrawScene(window *glfw.Window, w int32, h int32) {
 
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-	drawFoo()
-
-	gl.ClearColor(255, 255, 255, 0)
-	gl.Color3f(1, 0, 0)
-
-	gl.Begin(gl.POLYGON)
-	gl.Vertex2i(0, 0)
-	gl.Vertex2i(w, 0)
-	gl.Vertex2i(w, h)
-	gl.Vertex2i(0, h)
-	gl.End()
+	drawBoard()
 
 	window.SwapBuffers()
 }
 
-func drawFoo() {
-	s := Square{Point{0, 0}, Point{10, 0}, Point{10, 10}, Point{0, 10}}
-	s.Draw()
+func drawBoard() {
+	board := game.GetBoard()
+	for i := 0; i < 200; i++ {
+		for j := 0; j < 100; j++ {
+			switch board.GetCell(i, j) {
+			case game.Earth:
+				DrawEarth(coordsToScreen(i, j))
+			case game.Pipe:
+				DrawPipe(coordsToScreen(i, j))
+			case game.Power:
+				DrawPower(coordsToScreen(i, j))
+			case game.Water:
+				DrawWater(coordsToScreen(i, j))
+			}
+			DrawErr(i * tile_size,j * tile_size)
+		}
+	}
 }
 
 /* utils */
+func coordsToScreen(x, y int) (sx, sy int){
+	sx = x * tile_size
+	sy = y * tile_size
+	return
+}
+
 func drawVecPoint(p Point) {
 	gl.Vertex2i(int32(p.X), int32(p.Y))
+}
+
+type rgb struct {
+	r,g,b uint8
+}
+
+func (c rgb) SetGLColor() {
+	gl.ClearColor(255,255,255,0)
+	gl.Color3ub(c.r, c.g, c.b)
 }
