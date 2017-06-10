@@ -314,6 +314,8 @@ func genRandRow(offsetLastBarrier int) ([]int, bool) {
 
 var board GameBoard
 
+var viewEventChan chan *GopherCollision = make(chan *GopherCollision, 100)
+
 func Init() {
 	board = newBoard()
 	for i := 0; i < len(badgers); i++ {
@@ -323,6 +325,10 @@ func Init() {
 
 func GetBoard() *GameBoard {
 	return &board
+}
+
+func GetEventChan() *chan *GopherCollision {
+	return &viewEventChan
 }
 
 func Update() {
