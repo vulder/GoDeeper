@@ -6,9 +6,12 @@ import (
 
 const BOARD_HEIGHT int = 100
 const BOARD_WIDTH int = 200
-const MAX_RAND_ROWS_AT_ONCE = 10
-const BARRIERS_MIN_ROWS_BETWEEN = 2
-const P_BARRIER = 0.3
+const MAX_RAND_ROWS_AT_ONCE int = 10
+const BARRIERS_MIN_ROWS_BETWEEN int = 2
+const P_BARRIER float32 = 0.3
+const P_NEW_BADGER float32 = 0.05
+const MAX_N_BADGERS int = 10
+const BADGER_STEP_SIZE int = 10
 
 const (
 	Earth  int = iota
@@ -19,6 +22,25 @@ const (
 	Water  int = iota
 	Enemy  int = iota
 )
+
+const (
+	keepLeft int = iota
+	keepRight int = iota
+	right int = iota
+	left int = iota
+	down int = iota
+)
+
+type Badger struct {
+	currRow int
+	currCol int
+	remainingRowsDownward int
+	direction int
+}
+
+var badgers []*Badger = make([]*Badger, MAX_N_BADGERS, MAX_N_BADGERS)
+
+var currNBadgers int = 0
 
 type GameBoard struct {
 	array             [][]int
@@ -73,6 +95,159 @@ func (board GameBoard) moveGopher(row, col int) GopherCollision {
 	board.gopherRow = row
 	board.gopherCol = col
 	return nil
+}
+
+func moveBadgerKeepLeftRight(b *Badger, horizontalStep int) {
+	for i := 0; i < BADGER_STEP_SIZE; i++ {
+		board.array[b.currRow][b.currCol] = Tunnel
+		switch (board.GetCell(b.currRow, b.currCol + horizontalStep)) {
+		case Tunnel:
+		case Earth:
+			b.currCol = b.currCol + horizontalStep
+			break
+		default:
+			if b.currRow+1 < BOARD_HEIGHT-1 {
+				b.currRow = b.currRow + 1
+				b.remainingRowsDownward -= 1
+			}
+		}
+		board.array[b.currRow][b.currCol] = Enemy
+	}
+}
+
+func moveBadger(b *Badger) {
+	for i := 0; i < BADGER_STEP_SIZE; i++ {
+		board.array[b.currRow][b.currCol] = Tunnel
+		switch b.direction {
+		case down:
+			if b.currRow < BOARD_HEIGHT - 1 {
+				switch (board.array[b.currRow + 1][b.currCol]) {
+				case Earth:
+				case Tunnel:
+					b.currRow += 1
+					b.remainingRowsDownward -= 1
+					break
+				default:
+					if rand.Float32() <= 0.5 {
+						b.direction = left
+					} else {
+						b.direction = right
+					}
+					i -= 1
+				}
+			}
+			break
+
+		case left:
+			if b.currRow == BOARD_HEIGHT - 1 {
+				b.direction = down
+				i -= 1
+				break
+			}
+			switch board.array[b.currRow + 1][b.currCol] {
+			case Tunnel:
+			case Earth:
+				b.direction = down
+				i -= 1
+				break
+			default:
+				if b.currCol > 0 {
+					b.currCol -= 1
+				}
+			}
+			break
+
+		case right:
+			if b.currRow == BOARD_HEIGHT - 1 {
+				b.direction = down
+				i -= 1
+				break
+			}
+			switch board.array[b.currRow + 1][b.currCol] {
+			case Tunnel:
+			case Earth:
+				b.direction = down
+				i -= 1
+				break
+			default:
+				if b.currCol < BOARD_WIDTH - 1 {
+					b.currCol += 1
+				}
+			}
+		}
+		board.array[b.currRow][b.currCol] = Enemy
+	}
+}
+
+func updateBadgers() {
+	// delete existing badgers (if close to the edge)
+	for i := 0; i < len(badgers); i++ {
+		var b *Badger = badgers[i]
+		if b != nil {
+			var distance2Edge int
+			switch b.direction {
+			case left:
+			case keepLeft:
+				distance2Edge = b.currCol
+				break
+			case right:
+			case keepRight:
+				distance2Edge = BOARD_WIDTH - b.currCol - 1
+				break
+			default:
+				distance2Edge = BADGER_STEP_SIZE
+			}
+			if distance2Edge < BADGER_STEP_SIZE {
+				b = nil
+				currNBadgers -= 1
+			}
+		}
+	}
+
+	// make existing badgers leave the board to left or right when it is time
+	for i := 0; i < len(badgers); i++ {
+		var b *Badger = badgers[i]
+		if b != nil {
+			if b.remainingRowsDownward <= 0 {
+				switch b.direction {
+				case down:
+					if rand.Float32() <= 0.5 {
+						b.direction = keepLeft
+					} else {
+						b.direction = keepRight
+					}
+					break;
+				case left:
+					b.direction = keepLeft
+					break;
+				case right:
+					b.direction = keepRight
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
+
+	// move existing badgers
+	for i := 0; i < len(badgers); i++ {
+		var b *Badger = badgers[i]
+		if b != nil {
+			switch b.direction {
+			case keepLeft:
+				moveBadgerKeepLeftRight(b, -1)
+				break;
+			case keepRight:
+				moveBadgerKeepLeftRight(b, +1)
+				break;
+			default:
+				moveBadger(b)
+			}
+		}
+
+		// maybe generate new badger
+	}
 }
 
 func newBoard() GameBoard {
@@ -138,7 +313,9 @@ var board GameBoard
 
 func Init() {
 	board = newBoard()
-
+	for i := 0; i < len(badgers); i++ {
+		badgers[i] = nil
+	}
 }
 
 func GetBoard() *GameBoard {
