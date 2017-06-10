@@ -24,9 +24,11 @@ const MSG_GOPHER_DROWNED string = "Gopher drowned!"
 const MSG_NOM_NOM string = "Om nom nom!"
 
 const MSG_GO_GO string = "Go go go!"
+const MSG_BEST_NAVIGATOR string = "Best navigator!"
 
 const SCORE_INCR_INTERVAL = 300
 const FREQ_SCORE_INCR = 10
+const NARROW_PASSAGE_UPDATE = 50
 
 const (
 	Earth  int = iota
