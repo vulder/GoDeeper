@@ -1,19 +1,24 @@
 package game
 
-import "fmt"
-
 func GoDown() {
-	fmt.Println("we need to go deeper")
+	changeBoard(board.gopherRow + 1, board.gopherCol)
 }
 
 func GoRight() {
-	fmt.Println("we need to go righter")
+	changeBoard(board.gopherRow, board.gopherCol + 1)
 }
 
 func GoUp() {
-	fmt.Println("we need to go upper")
+	changeBoard(board.gopherRow - 1, board.gopherCol)
 }
 
 func GoLeft() {
-	fmt.Println("we need to go lefter")
+	changeBoard(board.gopherRow, board.gopherCol - 1)
+}
+
+func changeBoard(row int, col int) {
+	res := board.moveGopher(row, col)
+	if res != nil {
+		viewEventChan <- res
+	}
 }
