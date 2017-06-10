@@ -21,10 +21,11 @@ func GetHigh() int {
 type context struct {
 	Window *glfw.Window
 }
+
 var currentContext = context{}
 
 func (c context) GetWidthScale() int {
-	width,_ := c.Window.GetSize()
+	width, _ := c.Window.GetSize()
 	return width / w_tiles
 }
 
@@ -40,21 +41,21 @@ func DrawScene(window *glfw.Window, w int32, h int32) {
 
 	drawFoo()
 
-	gl.ClearColor(255,255,255,0)
-	gl.Color3f(1,0,0)
+	gl.ClearColor(255, 255, 255, 0)
+	gl.Color3f(1, 0, 0)
 
 	gl.Begin(gl.POLYGON)
-	gl.Vertex2i(0,0)
+	gl.Vertex2i(0, 0)
 	gl.Vertex2i(w, 0)
-	gl.Vertex2i(w,h)
-	gl.Vertex2i(0,h)
+	gl.Vertex2i(w, h)
+	gl.Vertex2i(0, h)
 	gl.End()
 
 	window.SwapBuffers()
 }
 
 func drawFoo() {
-	s := Square{Point{0,0},Point{10,0}, Point{10,10}, Point{0, 10}}
+	s := Square{Point{0, 0}, Point{10, 0}, Point{10, 10}, Point{0, 10}}
 	s.Draw()
 }
 
