@@ -30,11 +30,13 @@ const MSG_NOM_NOM string = "Om nom nom!"
 const MSG_GO_GO string = "Go go go!"
 const MSG_BEST_NAVIGATOR string = "Best navigator!"
 const MSG_THAT_WAS_CLOSE string = "That was close!"
+const MSG_DEAD_BADGER string = "Only a dead badger is a good badger!"
 
 const SCORE_INCR_INTERVAL = 300
 const FREQ_SCORE_INCR = 10
 const NARROW_PASSAGE_REWARD = 50
 const CLOSE_TO_ENEMY_REWARD = 100
+const DEAD_BADGER_REWARD = 150
 
 const GOPHER_SUPER_POWER_DURATION = 30
 
@@ -48,7 +50,7 @@ const (
 	Water            int = iota
 	Enemy            int = iota
 	SuperPowerFood   int = iota
-  Wormwhole        int = iota
+	Wormwhole        int = iota
 )
 
 const (
@@ -70,6 +72,7 @@ const (
 	RegularBonus        = iota
 	PassedNarrowPassage = iota
 	BarelyEscaped       = iota
+	DeadBadger          = iota
 )
 
 type ScoreUpdate struct {
@@ -114,6 +117,8 @@ func deleteBadgersAt(row, col int) {
 			badgers[i] = nil
 			board.array[row][col] = Tunnel
 			currNBadgers -= 1
+			score += DEAD_BADGER_REWARD
+			scoreChan <- &ScoreUpdate{MSG_DEAD_BADGER, DeadBadger, score, DEAD_BADGER_REWARD }
 		}
 	}
 }
@@ -404,7 +409,7 @@ func getWhormwholesInRow(row int) []int {
 func getWhormwholesInGivenRow(row []int) []int {
 	var spots [] int = make([] int, 2)
 	spotsfound := 0
-	for i:=0; i<len(row);i++ {
+	for i := 0; i < len(row); i++ {
 		if row[i] == Wormwhole {
 			spots[spotsfound] = i
 			spotsfound++
@@ -482,9 +487,9 @@ func genRandRow(offsetLastBarrier int) ([]int, bool) {
 		}
 	}
 
-  // place worm wholes
-  var freeSpaces []int = getFreeSpotsInGivenRow(&row)
-	if rand.Float32() <= P_WORMWHOLES && len(freeSpaces) != 1{
+	// place worm wholes
+	var freeSpaces []int = getFreeSpotsInGivenRow(&row)
+	if rand.Float32() <= P_WORMWHOLES && len(freeSpaces) != 1 {
 		row = addWormwholes(row, freeSpaces)
 	}
 
@@ -497,15 +502,15 @@ func addWormwholes(row, freeSpaces []int) []int {
 	//take the wholes that are furthest from each other if borders are in the row, else random columns
 	if len(freeSpaces) < len(row) {
 		spotOne = freeSpaces[0]
-		spotTwo = freeSpaces[len(freeSpaces) - 1]
-	} else if len(freeSpaces) == BOARD_WIDTH{
+		spotTwo = freeSpaces[len(freeSpaces)-1]
+	} else if len(freeSpaces) == BOARD_WIDTH {
 		// spawn the first whole inside the first half of the row
-		spotOne = rand.Intn(BOARD_WIDTH/3)
-		fmt.Println("0: " ,spotOne)
+		spotOne = rand.Intn(BOARD_WIDTH / 3)
+		fmt.Println("0: ", spotOne)
 		// make at least one space between the wholes
-		for i:=0; i<1; i++{
+		for i := 0; i < 1; i++ {
 			spotTwo = rand.Intn(BOARD_WIDTH)
-			if spotTwo - BOARD_WIDTH/3 > spotOne {
+			if spotTwo-BOARD_WIDTH/3 > spotOne {
 				i--
 			}
 		}
