@@ -446,6 +446,7 @@ func Update(dt time.Duration) {
 		board.gopherRow--
 		shiftBadgers()
 		if board.gopherRow < 0 {
+			board.gopherRow = 0
 			viewEventChan <- &GopherCollision{"Gopher got dragged outside!",
 																				board.gopherRow, board.gopherCol}
 		}
