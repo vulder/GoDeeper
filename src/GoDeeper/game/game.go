@@ -23,6 +23,11 @@ const MSG_GOPHER_GRILLED string = "Gopher got grilled!"
 const MSG_GOPHER_DROWNED string = "Gopher drowned!"
 const MSG_NOM_NOM string = "Om nom nom!"
 
+const MSG_GO_GO string = "Go go go!"
+
+const SCORE_INCR_INTERVAL = 300
+const FREQ_SCORE_INCR = 10
+
 const (
 	Earth  int = iota
 	Tunnel int = iota
@@ -46,6 +51,19 @@ type Badger struct {
 	currCol               int
 	remainingRowsDownward int
 	direction             int
+}
+
+const (
+	RegularBonus        = iota
+	PassedNarrowPassage = iota
+	BarelyEscaped       = iota
+)
+
+type ScoreUpdate struct {
+	msg       string
+	kind      int // is one of RegularBonus, passedNarrowPassage, barelyEscaped
+	newScore  int
+	increment int
 }
 
 func (b *Badger) String() string {
@@ -312,7 +330,6 @@ func getFreeSpotsInRow(row int) []int {
 	return getFreeSpotsInGivenRow(board.array[row])
 }
 
-
 func getFreeSpotsInGivenRow(row []int) []int {
 	nSpots := 0
 
@@ -404,13 +421,17 @@ func genRandRow(offsetLastBarrier int) ([]int, bool) {
 
 var board GameBoard
 
+var score int
+
 var viewEventChan chan *GopherCollision = make(chan *GopherCollision, 100)
+var scoreChan chan *ScoreUpdate = make(chan *ScoreUpdate, 100)
 
 func Init() {
 	board = newBoard()
 	for i := 0; i < len(badgers); i++ {
 		badgers[i] = nil
 	}
+	score = 0
 }
 
 func GetBoard() *GameBoard {
@@ -419,6 +440,10 @@ func GetBoard() *GameBoard {
 
 func GetEventChan() *chan *GopherCollision {
 	return &viewEventChan
+}
+
+func GetScoreUpdateChan() *chan *ScoreUpdate {
+	return &scoreChan
 }
 
 func shiftBadgers() {
@@ -435,6 +460,7 @@ func shiftBadgers() {
 }
 
 var init_freezing_counter = N_INIT_FREEZING_CYCLES
+var score_incr_counter = 0
 
 func Update(dt time.Duration) {
 	//Drags the board up
@@ -454,5 +480,12 @@ func Update(dt time.Duration) {
 	res := updateBadgers()
 	if res != nil {
 		viewEventChan <- res
+	}
+
+	score_incr_counter += 1
+	if score_incr_counter >= SCORE_INCR_INTERVAL {
+		score_incr_counter = 0
+		score += FREQ_SCORE_INCR
+		scoreChan <- &ScoreUpdate{MSG_GO_GO, RegularBonus, score, FREQ_SCORE_INCR }
 	}
 }
