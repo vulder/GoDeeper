@@ -199,7 +199,7 @@ func moveBadger(b *Badger) *GopherCollision {
 	return nil
 }
 
-func updateBadgers() {
+func updateBadgers() *GopherCollision {
 	// delete existing badgers (if close to the edge)
 	for i := 0; i < len(badgers); i++ {
 		var b *Badger = badgers[i]
@@ -256,13 +256,22 @@ func updateBadgers() {
 		if b != nil {
 			switch b.direction {
 			case keepLeft:
-				moveBadgerKeepLeftRight(b, -1)
+				res := moveBadgerKeepLeftRight(b, -1)
+				if res != nil {
+					return res
+				}
 				break;
 			case keepRight:
-				moveBadgerKeepLeftRight(b, +1)
+				res := moveBadgerKeepLeftRight(b, +1)
+				if res != nil {
+					return res
+				}
 				break;
 			default:
-				moveBadger(b)
+				res := moveBadger(b)
+				if res != nil {
+					return res
+				}
 			}
 		}
 
@@ -272,7 +281,7 @@ func updateBadgers() {
 			for gNum := 0; gNum < nNewBadgers; i++ {
 				var possibleStartPositions []int = getFreeSpotsInRow(0)
 				if len(possibleStartPositions) == 0 {
-					return
+					return nil
 				}
 				var gStartCol int = possibleStartPositions[rand.Intn(len(possibleStartPositions))]
 				var newBadger Badger = Badger{0, gStartCol,
@@ -286,6 +295,7 @@ func updateBadgers() {
 			}
 		}
 	}
+	return nil
 }
 
 func getFreeSpotsInRow(row int) []int {
