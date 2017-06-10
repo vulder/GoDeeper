@@ -72,7 +72,7 @@ func main() {
 	err = gl.Init()
 	checkErr(err)
 
-	ticker := time.NewTicker(time.Millisecond * 500)
+	ticker := time.NewTicker(time.Millisecond * 400)
 	go func() {
 		var lastTick = time.Now()
 
