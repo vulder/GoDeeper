@@ -255,7 +255,7 @@ func newBoard() GameBoard {
 	for i := 0; i < BOARD_HEIGHT; i++ {
 		array[i] = make([]int, BOARD_WIDTH, BOARD_WIDTH)
 	}
-	board := GameBoard{array, 0, 0, 0 }
+	board := GameBoard{array, 0, 0, BARRIERS_MIN_ROWS_BETWEEN - 1 }
 
 	for row := 0; row < BOARD_HEIGHT; row++ {
 		newRow, containsBarrier := genRandRow(board.offsetLastBarrier)
