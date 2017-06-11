@@ -24,6 +24,17 @@ const (
 	WormHole 	int8 = iota
 	Strawberry	int8 = iota
 	Dead		int8 = iota
+	// number textures
+	NUM_0		int8 = iota
+	NUM_1		int8 = iota
+	NUM_2		int8 = iota
+	NUM_3		int8 = iota
+	NUM_4		int8 = iota
+	NUM_5		int8 = iota
+	NUM_6		int8 = iota
+	NUM_7		int8 = iota
+	NUM_8		int8 = iota
+	NUM_9		int8 = iota
 )
 
 var TextureMap = make(map[int8]uint32)
@@ -49,6 +60,28 @@ func LoadTextures() {
 		1664,352,32,32)
 	TextureMap[Strawberry] = NewTexturePiece("img/Tileset.png",
 		1637,737,30,30)
+
+	// load number textures
+	TextureMap[NUM_0] = NewTexturePiece("img/Tileset.png",
+		1355,9,9,14)
+	TextureMap[NUM_1] = NewTexturePiece("img/Tileset.png",
+		1387,9,9,14)
+	TextureMap[NUM_2] = NewTexturePiece("img/Tileset.png",
+		1419,9,9,14)
+	TextureMap[NUM_3] = NewTexturePiece("img/Tileset.png",
+		1451,9,9,14)
+	TextureMap[NUM_4] = NewTexturePiece("img/Tileset.png",
+		1484,9,9,14)
+	TextureMap[NUM_5] = NewTexturePiece("img/Tileset.png",
+		1515,9,9,14)
+	TextureMap[NUM_6] = NewTexturePiece("img/Tileset.png",
+		1547,9,9,14)
+	TextureMap[NUM_7] = NewTexturePiece("img/Tileset.png",
+		1579,9,9,14)
+	TextureMap[NUM_8] = NewTexturePiece("img/Tileset.png",
+		1611,9,9,14)
+	TextureMap[NUM_9] = NewTexturePiece("img/Tileset.png",
+		1643,9,9,14)
 }
 
 func FreeTextures() {

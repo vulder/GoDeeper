@@ -5,12 +5,18 @@ import (
 	"fmt"
 	"time"
 	"sync/atomic"
+	"strconv"
+	"github.com/go-gl/gl/v2.1/gl"
 )
 
 const SCORE_WIDTH = 250
 const SCORE_HEIGHT = 80
 const BOTTOM_DISTANCE = 30
 const RIGHT_DISTANCE = 30
+
+const num_w_size = 9 * 2
+const num_h_size = 14 * 2
+const num_gap = 1
 
 const (
 	black	uint32 = iota
@@ -98,14 +104,59 @@ func drawScoreboard() bool {
 		return true
 	}
 
-	NewSquare(GetHigh()-SCORE_HEIGHT-BOTTOM_DISTANCE,
-		GetWidth()-SCORE_WIDTH-RIGHT_DISTANCE,
+	htop := GetHigh()-SCORE_HEIGHT-BOTTOM_DISTANCE
+	wtop := GetWidth()-SCORE_WIDTH-RIGHT_DISTANCE
+
+	NewSquare(htop,
+		wtop,
 		SCORE_WIDTH,SCORE_HEIGHT,
 		color).Draw()
 
 	// Drawing actual score
 	cScore := atomic.LoadInt32(&currentScore)
-	fmt.Println("Current score: ", cScore)
+
+	gl.Enable(gl.BLEND)
+	defer gl.Disable(gl.BLEND)
+
+	number_str := strconv.Itoa(int(cScore))
+	for i, char := range number_str {
+		var num int8
+		switch char {
+		case '0':
+			num = NUM_0
+			break
+		case '1':
+			num = NUM_1
+			break
+		case '2':
+			num = NUM_2
+			break
+		case '3':
+			num = NUM_3
+			break
+		case '4':
+			num = NUM_4
+			break
+		case '5':
+			num = NUM_5
+			break
+		case '6':
+			num = NUM_6
+			break
+		case '7':
+			num = NUM_7
+			break
+		case '8':
+			num = NUM_8
+			break
+		case '9':
+			num = NUM_9
+			break
+		}
+
+		wtop_ralign := wtop + SCORE_WIDTH - (num_w_size * ((len(number_str) - i)))
+		DrawTexture(htop, wtop_ralign, num_w_size, num_h_size, num)
+	}
 
 	return false
 }
