@@ -9,7 +9,7 @@ import (
 
 const BOARD_HEIGHT int = 50
 const BOARD_WIDTH int = 25
-const BARRIERS_MIN_ROWS_BETWEEN int = 5
+const BARRIERS_MIN_ROWS_BETWEEN int = 2
 const P_ROW_HAS_BARRIER float32 = 0.7
 const P_PLACE_BARRIER float32 = 0.3
 const P_WORMHOLES float32 = 0.10
@@ -179,11 +179,12 @@ func (board *GameBoard) moveGopher(row, col int) *GopherCollision {
 		case Water:
 			return &GopherCollision{MSG_GOPHER_DROWNED, row, col }
 		case Enemy:
-			return &GopherCollision{MSG_NOM_NOM, row, col }
+			if board.gopherSuperPowerCycleCount <= 0 {
+				return &GopherCollision{MSG_NOM_NOM, row, col }
+			}
 		case Wormhole:
 			var p *Portal = getWormholesInGivenRow(row)
 			board.array[row][col] = Tunnel
-			board.gopherCol = col
 			if col == p.colOne {
 				col = p.colTwo
 			} else {
@@ -543,7 +544,7 @@ func addWormholes(row []int, rowNum int, freeSpaces []int) []int {
 		// make at least one space between the holes
 		for i := 0; i < 1; i++ {
 			spotTwo = rand.Intn(BOARD_WIDTH)
-			if spotTwo - BOARD_WIDTH/3 > spotOne {
+			if spotTwo-BOARD_WIDTH/3 > spotOne {
 				i--
 			}
 		}

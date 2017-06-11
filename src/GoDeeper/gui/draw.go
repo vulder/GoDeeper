@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	tile_size = 50
+	tile_size = 20
 )
 
 func GetWidth() int {
