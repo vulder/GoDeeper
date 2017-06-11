@@ -24,6 +24,8 @@ const (
 	WormHole 	int8 = iota
 	Strawberry	int8 = iota
 	Dead		int8 = iota
+	WormSpawn	int8 = iota
+
 	// number textures
 	NUM_0		int8 = iota
 	NUM_1		int8 = iota
@@ -56,10 +58,14 @@ func LoadTextures() {
 		130,320,30,30)
 	TextureMap[Wall1] = NewTexturePiece("img/Tileset.png",
 		256,544,32,32)
+	//TextureMap[WormHole] = NewTexturePiece("img/Tileset.png",
+	//	1664,352,32,32)
 	TextureMap[WormHole] = NewTexturePiece("img/Tileset.png",
-		1664,352,32,32)
+		577,1377,30,30)
 	TextureMap[Strawberry] = NewTexturePiece("img/Tileset.png",
 		1637,737,30,30)
+	TextureMap[WormSpawn] = NewTexturePiece("img/Tileset.png",
+		65,321,32,32)
 
 	// load number textures
 	TextureMap[NUM_0] = NewTexturePiece("img/Tileset.png",

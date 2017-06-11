@@ -98,6 +98,18 @@ type TriggeredEffect struct {
 	col int
 }
 
+func (te TriggeredEffect) GetMsg() string {
+	return te.msg
+}
+
+func (te TriggeredEffect) GetRow() int {
+	return te.row
+}
+
+func (te TriggeredEffect) GetCol() int {
+	return te.col
+}
+
 func (b *Badger) String() string {
 	res := "row: " + strconv.Itoa(b.currRow) +
 			"\ncol: " + strconv.Itoa(b.currRow) +
@@ -591,6 +603,10 @@ func GetEventChan() *chan *GopherCollision {
 
 func GetScoreUpdateChan() *chan *ScoreUpdate {
 	return &scoreChan
+}
+
+func GetEffectChan() *chan *TriggeredEffect {
+	return &effectChan
 }
 
 func shiftBadgers() {

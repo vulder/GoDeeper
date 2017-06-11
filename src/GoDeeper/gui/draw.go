@@ -46,6 +46,8 @@ func DrawScene(window *glfw.Window) {
 
 	drawBoard()
 
+	drawEffect()
+
 	exit := drawScore()
 
 	window.SwapBuffers()
@@ -68,6 +70,23 @@ func drawBG () {
 
 func drawScore() bool {
 	return drawScoreboard()
+}
+
+func drawEffect() {
+	effectChan := game.GetEffectChan()
+	select {
+	case effect := <-*effectChan:
+		switch effect.GetMsg() {
+		case game.MSG_PORTAL_USED:
+			gl.Enable(gl.BLEND)
+			defer gl.Disable(gl.BLEND)
+			sx, sy := coordsToScreen(effect.GetCol(),effect.GetRow())
+			DrawTextureTS(sx, sy, WormSpawn)
+			break
+		}
+		break
+	default:
+	}
 }
 
 func drawBoard() {
