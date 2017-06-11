@@ -28,10 +28,6 @@ func changeBoard(row int, col int) {
 		board.gopherSuperPowerCycleCount += GOPHER_SUPER_POWER_DURATION
 	}
 
-	if checkForCellKind(row, col, Enemy) && board.gopherSuperPowerCycleCount > 0 {
-		deleteBadgersAt(row, col)
-	}
-
 	res := board.moveGopher(row, col)
 	if res != nil {
 		viewEventChan <- res

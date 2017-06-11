@@ -171,6 +171,8 @@ func (board *Board) moveGopher(row, col int) *GopherCollision {
 		case Enemy:
 			if board.gopherSuperPowerCycleCount <= 0 {
 				return &GopherCollision{MSG_NOM_NOM, row, col }
+			} else {
+				deleteBadgersAt(row, col)
 			}
 		case Wormhole:
 			effectChan <- &TriggeredEffect{MSG_PORTAL_USED, row, col}
@@ -215,7 +217,11 @@ func moveBadgerKeepLeftRight(b *Badger, horizontalStep int) *GopherCollision {
 		}
 		board.array[b.currRow][b.currCol] = Enemy
 		if board.gopherCol == b.currCol && board.gopherRow == b.currRow {
-			return &GopherCollision{MSG_NOM_NOM, b.currRow, b.currCol}
+			if board.gopherSuperPowerCycleCount <= 0 {
+				return &GopherCollision{MSG_NOM_NOM, b.currRow, b.currCol}
+			} else {
+				deleteBadgersAt(b.currRow, b.currCol)
+			}
 		}
 	}
 	return nil
@@ -292,7 +298,11 @@ func moveBadger(b *Badger) *GopherCollision {
 
 		board.array[b.currRow][b.currCol] = Enemy
 		if board.gopherCol == b.currCol && board.gopherRow == b.currRow {
-			return &GopherCollision{MSG_NOM_NOM, b.currRow, b.currCol}
+			if board.gopherSuperPowerCycleCount <= 0 {
+				return &GopherCollision{MSG_NOM_NOM, b.currRow, b.currCol}
+			} else {
+				deleteBadgersAt(b.currRow, b.currCol)
+			}
 		}
 	}
 	return nil
@@ -639,8 +649,5 @@ func Update(dt time.Duration) {
 
 	if board.gopherSuperPowerCycleCount > 0 {
 		board.gopherSuperPowerCycleCount -= 1
-	}
-	if board.gopherSuperPowerCycleCount > 0 {
-		deleteBadgersAt(board.gopherRow, board.gopherCol)
 	}
 }
