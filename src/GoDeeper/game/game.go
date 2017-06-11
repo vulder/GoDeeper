@@ -13,11 +13,11 @@ const BARRIERS_MIN_ROWS_BETWEEN int = 2
 const P_ROW_HAS_BARRIER float32 = 0.7
 const P_PLACE_BARRIER float32 = 0.3
 const P_WORMHOLES float32 = 0.10
-const P_NEW_BADGER float32 = 0.20
+const P_NEW_BADGER float32 = 0.30
 const MAX_N_BADGERS int = 5
 const MAX_N_PORTALS int = 6
 const BADGER_MAX_VERTICAL_WAY = 40
-const BADGER_STEP_SIZE int = 5
+const BADGER_STEP_SIZE int = 6
 
 const P_SUPER_POWER_FOOD float32 = 0.07
 
@@ -34,12 +34,12 @@ const MSG_THAT_WAS_CLOSE string = "That was close!"
 const MSG_DEAD_BADGER string = "Only a dead badger is a good badger!"
 
 const SCORE_INCR_INTERVAL = 300
-const FREQ_SCORE_INCR = 10
+const FREQ_SCORE_INCR = 5
 const NARROW_PASSAGE_REWARD = 50
 const CLOSE_TO_ENEMY_REWARD = 100
 const DEAD_BADGER_REWARD = 150
 
-const GOPHER_SUPER_POWER_DURATION = 30
+const GOPHER_SUPER_POWER_DURATION = 7
 
 const (
 	Earth            int = iota
