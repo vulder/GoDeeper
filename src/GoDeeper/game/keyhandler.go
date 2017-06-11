@@ -24,6 +24,7 @@ func GoLeft() {
 func changeBoard(row int, col int) {
 
 	if checkForCellKind(row, col, SuperPowerFood) {
+		effectChan <- &TriggeredEffect{MSG_ATE_FRUIT, row, col}
 		board.gopherSuperPowerCycleCount += GOPHER_SUPER_POWER_DURATION
 	}
 
@@ -40,7 +41,7 @@ func changeBoard(row int, col int) {
 	checkCloseToEnemy()
 }
 
-func checkForCellKind(row int, col int, kind int) bool {
+func checkForCellKind(row int, col int, _ int) bool {
 	return row >= 0 && row < BOARD_HEIGHT && col >= 0 && col < BOARD_WIDTH && board.GetCell(row, col) == SuperPowerFood
 }
 

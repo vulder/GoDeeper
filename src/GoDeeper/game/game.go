@@ -142,7 +142,7 @@ func deleteBadgersAt(row, col int) {
 	}
 }
 
-type GameBoard struct {
+type Board struct {
 	array                      [][]int
 	gopherCol                  int
 	gopherRow                  int
@@ -150,11 +150,11 @@ type GameBoard struct {
 	gopherSuperPowerCycleCount int
 }
 
-func (board *GameBoard) GetCell(row, col int) int {
+func (board *Board) GetCell(row, col int) int {
 	return board.array[row][col]
 }
 
-func (board *GameBoard) addRow(newRow []int, hasBarrier bool) {
+func (board *Board) addRow(newRow []int, hasBarrier bool) {
 	for row := 0; row < BOARD_HEIGHT-1; row++ {
 		for col := 0; col < BOARD_WIDTH; col++ {
 			board.array[row][col] = board.array[row+1][col]
@@ -178,7 +178,7 @@ type GopherCollision struct {
 	col int
 }
 
-func (board *GameBoard) moveGopher(row, col int) *GopherCollision {
+func (board *Board) moveGopher(row, col int) *GopherCollision {
 	if row >= 0 && row < BOARD_HEIGHT && col >= 0 && col < BOARD_WIDTH {
 		switch board.array[row][col] {
 		case Pipe:
@@ -200,9 +200,6 @@ func (board *GameBoard) moveGopher(row, col int) *GopherCollision {
 			} else {
 				col = p.colOne
 			}
-
-		default:
-			break
 		}
 		board.array[board.gopherRow][board.gopherCol] = Tunnel
 		if board.gopherSuperPowerCycleCount > 0 {
@@ -369,8 +366,6 @@ func updateBadgers() *GopherCollision {
 					b.direction = keepLeft
 				case right:
 					b.direction = keepRight
-				default:
-					break
 				}
 			}
 		}
@@ -434,8 +429,6 @@ func getFreeSpotsInGivenRow(row *[]int) []int {
 		switch (*row)[i] {
 		case Tunnel, Earth:
 			nSpots += 1
-		default:
-			break
 		}
 	}
 	var res []int = make([]int, nSpots, nSpots)
@@ -446,8 +439,6 @@ func getFreeSpotsInGivenRow(row *[]int) []int {
 		case Tunnel, Earth:
 			res[cnt] = i
 			cnt += 1
-		default:
-			break
 		}
 	}
 
@@ -464,13 +455,13 @@ func getWormholesInGivenRow(row int) *Portal {
 	return nil
 }
 
-func newBoard() GameBoard {
+func newBoard() Board {
 	var array [][]int = make([][]int, BOARD_HEIGHT, BOARD_HEIGHT)
 	for i := 0; i < BOARD_HEIGHT; i++ {
 		array[i] = make([]int, BOARD_WIDTH, BOARD_WIDTH)
 	}
-	board := GameBoard{array, 0, 0, BARRIERS_MIN_ROWS_BETWEEN - 1,
-										 0 }
+	board := Board{array, 0, 0, BARRIERS_MIN_ROWS_BETWEEN - 1,
+				   0 }
 
 	for row := 0; row < BOARD_HEIGHT; row++ {
 		newRow, containsBarrier := genRandRow(board.offsetLastBarrier, row)
@@ -574,7 +565,7 @@ func addWormholes(row []int, rowNum int, freeSpaces []int) []int {
 	return row
 }
 
-var board GameBoard
+var board Board
 
 var score int
 
@@ -590,7 +581,7 @@ func Init() {
 	score = 0
 }
 
-func GetBoard() *GameBoard {
+func GetBoard() *Board {
 	return &board
 }
 
@@ -633,6 +624,7 @@ var score_incr_counter = 0
 
 func Update(dt time.Duration) {
 	//Drags the board up
+	time.Sleep(dt)
 	if init_freezing_counter > 0 {
 		init_freezing_counter -= 1
 	} else {
