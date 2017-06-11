@@ -205,7 +205,7 @@ func moveBadgerKeepLeftRight(b *Badger, horizontalStep int) *GopherCollision {
 		board.array[b.currRow][b.currCol] = Tunnel
 		if b.currCol+horizontalStep >= 0 && b.currCol+horizontalStep < BOARD_WIDTH {
 			switch board.GetCell(b.currRow, b.currCol+horizontalStep) {
-			case Tunnel, Earth, Gopher, GopherSuperPower, Enemy:
+			case Tunnel, Earth, Gopher, GopherSuperPower, Enemy, Wormhole:
 				b.currCol = b.currCol + horizontalStep
 
 			default:
@@ -215,12 +215,28 @@ func moveBadgerKeepLeftRight(b *Badger, horizontalStep int) *GopherCollision {
 				}
 			}
 		}
+		if isOnWormhole(b) {
+			moveBatcherThroughPortal(b)
+		}
 		board.array[b.currRow][b.currCol] = Enemy
 		if board.gopherCol == b.currCol && board.gopherRow == b.currRow {
 			return &GopherCollision{MSG_NOM_NOM, b.currRow, b.currCol}
 		}
 	}
 	return nil
+}
+
+func isOnWormhole(b *Badger) bool {
+	return board.GetCell(b.currRow, b.currCol) == Wormhole
+}
+
+func moveBatcherThroughPortal(b *Badger) {
+	var p *Portal = getWormholesInGivenRow(b.currRow)
+	if p.colOne == b.currCol {
+		b.currCol = p.colTwo
+	} else {
+		b.currCol = p.colOne
+	}
 }
 
 func moveBadger(b *Badger) *GopherCollision {
@@ -273,6 +289,11 @@ func moveBadger(b *Badger) *GopherCollision {
 				}
 			}
 		}
+
+		if isOnWormhole(b) {
+			moveBatcherThroughPortal(b)
+		}
+
 		board.array[b.currRow][b.currCol] = Enemy
 		if board.gopherCol == b.currCol && board.gopherRow == b.currRow {
 			return &GopherCollision{MSG_NOM_NOM, b.currRow, b.currCol}
