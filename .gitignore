@@ -5,3 +5,4 @@ src/GoDeeper/deploy/
 src/GoDeeper/rcc.cpp
 src/GoDeeper/rcc.qrc
 src/GoDeeper/rcc_cgo_linux_linux_amd64.go
+img/
