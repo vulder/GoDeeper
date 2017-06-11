@@ -33,6 +33,9 @@ const MSG_BEST_NAVIGATOR string = "Best navigator!"
 const MSG_THAT_WAS_CLOSE string = "That was close!"
 const MSG_DEAD_BADGER string = "Only a dead badger is a good badger!"
 
+const MSG_PORTAL_USED string = "portal used"
+const MSG_ATE_FRUIT string = "ate fruit"
+
 const SCORE_INCR_INTERVAL = 300
 const FREQ_SCORE_INCR = 5
 const NARROW_PASSAGE_REWARD = 50
@@ -87,6 +90,12 @@ type ScoreUpdate struct {
 	kind      int // is one of RegularBonus, passedNarrowPassage, barelyEscaped
 	NewScore  int
 	increment int
+}
+
+type TriggeredEffect struct {
+	msg string
+	row int
+	col int
 }
 
 func (b *Badger) String() string {
@@ -183,6 +192,7 @@ func (board *GameBoard) moveGopher(row, col int) *GopherCollision {
 				return &GopherCollision{MSG_NOM_NOM, row, col }
 			}
 		case Wormhole:
+			effectChan <- &TriggeredEffect{MSG_PORTAL_USED, row, col}
 			var p *Portal = getWormholesInGivenRow(row)
 			board.array[row][col] = Tunnel
 			if col == p.colOne {
@@ -222,6 +232,7 @@ func moveBadgerKeepLeftRight(b *Badger, horizontalStep int) *GopherCollision {
 			}
 		}
 		if isOnWormhole(b) {
+			effectChan <- &TriggeredEffect{MSG_PORTAL_USED, b.currRow, b.currCol}
 			moveBatcherThroughPortal(b)
 		}
 		board.array[b.currRow][b.currCol] = Enemy
@@ -298,6 +309,7 @@ func moveBadger(b *Badger) *GopherCollision {
 
 		if isOnWormhole(b) {
 			moveBatcherThroughPortal(b)
+			effectChan <- &TriggeredEffect{MSG_PORTAL_USED, b.currRow, b.currCol}
 		}
 
 		board.array[b.currRow][b.currCol] = Enemy
@@ -568,6 +580,7 @@ var score int
 
 var viewEventChan chan *GopherCollision = make(chan *GopherCollision, 100)
 var scoreChan chan *ScoreUpdate = make(chan *ScoreUpdate, 100)
+var effectChan chan *TriggeredEffect = make(chan *TriggeredEffect, 100)
 
 func Init() {
 	board = newBoard()
