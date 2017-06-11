@@ -23,11 +23,13 @@ const (
 	Wall1  	 	int8 = iota
 	WormHole 	int8 = iota
 	Strawberry	int8 = iota
+	Dead		int8 = iota
 )
 
 var TextureMap = make(map[int8]uint32)
 
 func LoadTextures() {
+	TextureMap[Dead] = NewTexture("img/dead.jpg")
 	TextureMap[Test] = NewTexture("img/test.png")
 	TextureMap[Gopher] = NewTexture("img/gopherb.png")
 	TextureMap[Earth1] = NewTexture("img/earth1.jpg")

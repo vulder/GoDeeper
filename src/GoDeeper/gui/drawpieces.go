@@ -12,6 +12,7 @@ type Earth struct {
 }
 
 func InitDrawPieceStates() {
+	go checkChannels()
 	go powerChange()
 }
 

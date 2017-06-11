@@ -5,6 +5,8 @@ import (
 	"github.com/go-gl/glfw/v3.1/glfw"
 
 	"GoDeeper/game"
+	"time"
+	"syscall"
 )
 
 const (
@@ -44,7 +46,15 @@ func DrawScene(window *glfw.Window) {
 
 	drawBoard()
 
+	exit := drawScore()
+
 	window.SwapBuffers()
+
+	if exit {
+		t := time.NewTimer(time.Second * 5)
+		<-t.C
+		syscall.Exit(0)
+	}
 }
 
 func drawBG () {
@@ -54,6 +64,10 @@ func drawBG () {
 			DrawErr(sx, sy)
 		}
 	}
+}
+
+func drawScore() bool {
+	return drawScoreboard()
 }
 
 func drawBoard() {

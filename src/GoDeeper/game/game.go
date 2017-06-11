@@ -85,7 +85,7 @@ const (
 type ScoreUpdate struct {
 	msg       string
 	kind      int // is one of RegularBonus, passedNarrowPassage, barelyEscaped
-	newScore  int
+	NewScore  int
 	increment int
 }
 
@@ -164,7 +164,7 @@ func (board *GameBoard) addRow(newRow []int, hasBarrier bool) {
 }
 
 type GopherCollision struct {
-	msg string
+	Msg string
 	row int
 	col int
 }
