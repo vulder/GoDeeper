@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	tile_size = 10
+	tile_size = 50
 )
 
 func GetWidth() int {
@@ -43,8 +43,6 @@ func DrawScene(window *glfw.Window) {
 	drawBG()
 
 	drawBoard()
-
-	DrawWater(0,0)
 
 	window.SwapBuffers()
 }
