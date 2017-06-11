@@ -7,6 +7,7 @@ type Square struct {
 	color rgb
 }
 
+// TODO: please merge me
 // TODO: this should be (left, top int)
 func NewSquareTS(top, left int, color rgb) *Square {
 	s := new(Square)

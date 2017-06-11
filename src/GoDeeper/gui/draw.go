@@ -40,9 +40,22 @@ func DrawScene(window *glfw.Window) {
 
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
+	drawBG()
+
 	drawBoard()
 
+	DrawWater(0,0)
+
 	window.SwapBuffers()
+}
+
+func drawBG () {
+	for i := 0; i < game.BOARD_HEIGHT; i++ {
+		for j := 0; j < game.BOARD_WIDTH; j++ {
+			sx, sy := coordsToScreen(i, j)
+			DrawErr(sx, sy)
+		}
+	}
 }
 
 func drawBoard() {
@@ -60,6 +73,9 @@ func drawBoard() {
 				break
 			case game.Gopher:
 				DrawGopher(sx, sy)
+				break
+			case game.GopherSuperPower:
+				DrawGopherSuperPower(sx,sy)
 				break
 			case game.Pipe:
 				DrawPipe(sx, sy)
@@ -80,7 +96,7 @@ func drawBoard() {
 				DrawWormwhole(sx, sy)
 				break
 			}
-			DrawErr(sx, sy)
+			//DrawErr(sx, sy)
 		}
 	}
 }

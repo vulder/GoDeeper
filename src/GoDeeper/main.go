@@ -72,7 +72,7 @@ func main() {
 	err = gl.Init()
 	checkErr(err)
 
-	ticker := time.NewTicker(time.Millisecond * 400)
+	ticker := time.NewTicker(time.Millisecond * 1000)
 	go func() {
 		var lastTick = time.Now()
 
@@ -84,12 +84,15 @@ func main() {
 	}()
 
 	gl.Ortho(0, float64(gui.GetWidth()), float64(gui.GetHigh()), 0, -1, 1)
-	gl.Enable(gl.DEPTH_TEST)
+	//gl.Enable(gl.DEPTH_TEST)
+	gl.Disable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(255, 255, 255, 0)
 	gl.LineWidth(1)
 	gl.Color3f(1, 0, 0)
 	gl.Enable(gl.DOUBLEBUFFER)
+
+	gl.BlendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
 
 	window.SetFramebufferSizeCallback(func(w *glfw.Window, width int, height int) {
 		gl.Viewport(0, 0, int32(width), int32(height))
@@ -106,6 +109,8 @@ func main() {
 	gl.Disable(gl.LIGHTING)
 
 	game.Init()
+
+	gui.InitDrawPieceStates()
 
 	for !window.ShouldClose() {
 		gui.DrawScene(window)

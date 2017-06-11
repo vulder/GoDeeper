@@ -11,12 +11,18 @@ import (
 )
 
 const (
-	Test   int8 = iota
-	Gopher int8 = iota
-	Earth1 int8 = iota
-	Tunnel int8 = iota
-	Water  int8 = iota
-	Badger int8 = iota
+	Test    	int8 = iota
+	Gopher  	int8 = iota
+	Earth1  	int8 = iota
+	Tunnel  	int8 = iota
+	Water   	int8 = iota
+	Badger  	int8 = iota
+	TileSet  	int8 = iota
+	PowerG 	 	int8 = iota
+	PowerP 	 	int8 = iota
+	Wall1  	 	int8 = iota
+	WormHole 	int8 = iota
+	Strawberry	int8 = iota
 )
 
 var TextureMap = make(map[int8]uint32)
@@ -26,8 +32,21 @@ func LoadTextures() {
 	TextureMap[Gopher] = NewTexture("img/gopherb.png")
 	TextureMap[Earth1] = NewTexture("img/earth1.jpg")
 	TextureMap[Tunnel] = NewTexture("img/tunnel.jpg")
-	TextureMap[Water] = NewTexture("img/water.png")
-	TextureMap[Badger] = NewTexture("img/badger.png")
+	TextureMap[Water]  = NewTexturePiece("img/Tileset.png",
+		864,608,30,30)
+	//TextureMap[Badger] = NewTexture("img/badger.png")
+	TextureMap[Badger] = NewTexturePiece("img/Tileset.png",
+		641, 98, 30, 30)
+	TextureMap[PowerG] = NewTexturePiece("img/Tileset.png",
+		160,320,30,30)
+	TextureMap[PowerP] = NewTexturePiece("img/Tileset.png",
+		130,320,30,30)
+	TextureMap[Wall1] = NewTexturePiece("img/Tileset.png",
+		256,544,32,32)
+	TextureMap[WormHole] = NewTexturePiece("img/Tileset.png",
+		1664,352,32,32)
+	TextureMap[Strawberry] = NewTexturePiece("img/Tileset.png",
+		1637,737,30,30)
 }
 
 func FreeTextures() {
@@ -81,6 +100,43 @@ func NewTexture(file string) uint32 {
 		panic("unsupported stride")
 	}
 	draw.Draw(rgba, rgba.Bounds(), img, image.Point{0, 0}, draw.Src)
+
+	var texture uint32
+	gl.Enable(gl.TEXTURE_2D)
+	gl.GenTextures(1, &texture)
+	gl.BindTexture(gl.TEXTURE_2D, texture)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+	gl.TexImage2D(
+		gl.TEXTURE_2D,
+		0,
+		gl.RGBA,
+		int32(rgba.Rect.Size().X),
+		int32(rgba.Rect.Size().Y),
+		0,
+		gl.RGBA,
+		gl.UNSIGNED_BYTE,
+		gl.Ptr(rgba.Pix))
+	gl.Disable(gl.TEXTURE_2D)
+
+	return texture
+}
+
+func NewTexturePiece(file string, x, y, w, h int) uint32 {
+	imgFile, err := os.Open(file)
+	if err != nil {
+		log.Fatalf("texture %q not found on disk: %v\n", file, err)
+	}
+	img, _, err := image.Decode(imgFile)
+	if err != nil {
+		panic(err)
+	}
+
+	rgba := image.NewRGBA(image.Rect(x,y,x+w,y+h))
+	if rgba.Stride != rgba.Rect.Size().X*4 {
+		panic("unsupported stride")
+	}
+	draw.Draw(rgba, rgba.Bounds(), img, image.Point{x,y}, draw.Src)
 
 	var texture uint32
 	gl.Enable(gl.TEXTURE_2D)
