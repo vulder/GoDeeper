@@ -25,7 +25,7 @@ func checkErr(e error) {
 }
 
 func keyPress(w *glfw.Window, k glfw.Key, s int, act glfw.Action, mods glfw.ModifierKey) {
-	if act == glfw.Press {
+	if act == glfw.Press || act == glfw.Repeat {
 		switch k {
 		case glfw.KeyDown:
 			game.GoDown()
@@ -34,7 +34,7 @@ func keyPress(w *glfw.Window, k glfw.Key, s int, act glfw.Action, mods glfw.Modi
 		case glfw.KeyUp:
 			game.GoUp()
 		case glfw.KeyLeft:
-			game.GoLeft()
+			game.GoLeft();
 		}
 	}
 }
