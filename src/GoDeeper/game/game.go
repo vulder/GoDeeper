@@ -17,7 +17,7 @@ const P_NEW_BADGER float32 = 0.20
 const MAX_N_BADGERS int = 5
 const MAX_N_PORTALS int = 6
 const BADGER_MAX_VERTICAL_WAY = 40
-const BADGER_STEP_SIZE int = 2
+const BADGER_STEP_SIZE int = 5
 
 const P_SUPER_POWER_FOOD float32 = 0.07
 
@@ -537,14 +537,14 @@ func addWormholes(row []int, rowNum int, freeSpaces []int) []int {
 	if len(freeSpaces) < len(row) {
 		spotOne = freeSpaces[0]
 		spotTwo = freeSpaces[len(freeSpaces)-1]
-	} else if len(freeSpaces) == BOARD_WIDTH {
+	} else {
 		// spawn the first hole inside the first half of the row
 		spotOne = rand.Intn(BOARD_WIDTH / 3)
 		fmt.Println("0: ", spotOne)
 		// make at least one space between the holes
 		for i := 0; i < 1; i++ {
 			spotTwo = rand.Intn(BOARD_WIDTH)
-			if spotTwo-BOARD_WIDTH/3 > spotOne {
+			if spotTwo-BOARD_WIDTH/3 < spotOne {
 				i--
 			}
 		}
