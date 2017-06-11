@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"strconv"
 	"fmt"
+	"time"
 )
 
 const BOARD_HEIGHT int = 50
@@ -110,7 +111,7 @@ func (b *Badger) String() string {
 	return res
 }
 
-var portals []*Portal = make([]*Portal, MAX_N_PORTALS, 2)
+var portals []*Portal = make([]*Portal, MAX_N_PORTALS, MAX_N_PORTALS)
 var badgers []*Badger = make([]*Badger, MAX_N_BADGERS, MAX_N_BADGERS)
 var currNBadgers int = 0
 var currNPortals int = 0
@@ -175,13 +176,13 @@ func (board *GameBoard) moveGopher(row, col int) *GopherCollision {
 		case Enemy:
 			return &GopherCollision{MSG_NOM_NOM, row, col }
 		case Wormhole:
-			var spots []int = getWormholesInRow(row)
+			var p *Portal = getWormholesInGivenRow(row)
 			board.array[row][col] = Tunnel
 			board.gopherCol = col
-			if col == spots[0] {
-				col = spots[1]
+			if col == p.colOne {
+				col = p.colTwo
 			} else {
-				col = spots[0]
+				col = p.colOne
 			}
 
 		default:
@@ -284,8 +285,10 @@ func updatePortals() {
 	//repaint all portals in case they were overwritten by a badger or the gopher
 	for i := 0; i < len(portals); i++ {
 		var p *Portal = portals[i]
-		board.array[p.row][p.colOne] = Wormhole
-		board.array[p.row][p.colTwo] = Wormhole
+		if p != nil {
+			board.array[p.row][p.colOne] = Wormhole
+			board.array[p.row][p.colTwo] = Wormhole
+		}
 	}
 }
 func updateBadgers() *GopherCollision {
@@ -412,20 +415,14 @@ func getFreeSpotsInGivenRow(row *[]int) []int {
 	return res
 }
 
-func getWormholesInRow(row int) []int {
-	return getWormholesInGivenRow(board.array[row])
-}
-
-func getWormholesInGivenRow(row []int) []int {
-	var spots [] int = make([] int, 2)
-	spotsfound := 0
-	for i := 0; i < len(row); i++ {
-		if row[i] == Wormhole {
-			spots[spotsfound] = i
-			spotsfound++
+func getWormholesInGivenRow(row int) *Portal {
+	for i := 0; i < len(portals); i++ {
+		var p *Portal = portals[i]
+		if p != nil && p.row == row {
+			return p
 		}
 	}
-	return spots
+	return nil
 }
 
 func newBoard() GameBoard {
@@ -437,14 +434,14 @@ func newBoard() GameBoard {
 										 0 }
 
 	for row := 0; row < BOARD_HEIGHT; row++ {
-		newRow, containsBarrier := genRandRow(board.offsetLastBarrier)
+		newRow, containsBarrier := genRandRow(board.offsetLastBarrier, row)
 		board.addRow(newRow, containsBarrier)
 	}
 	board.array[0][0] = Gopher
 	return board
 }
 
-func genRandRow(offsetLastBarrier int) ([]int, bool) {
+func genRandRow(offsetLastBarrier int, rowNum int) ([]int, bool) {
 	var row []int = make([] int, BOARD_WIDTH)
 
 	for j := 0; j < BOARD_WIDTH; j++ {
@@ -499,14 +496,14 @@ func genRandRow(offsetLastBarrier int) ([]int, bool) {
 
 	// place worm holes
 	var freeSpaces []int = getFreeSpotsInGivenRow(&row)
-	if rand.Float32() <= P_WORMHOLES && len(freeSpaces) != 1 {
-		row = addWormholes(row, freeSpaces)
+	if rand.Float32() <= P_WORMHOLES && len(freeSpaces) != 1 && currNPortals < MAX_N_PORTALS {
+		row = addWormholes(row, rowNum, freeSpaces)
 	}
 
 	return row, containsBarrier
 }
 
-func addWormholes(row, freeSpaces []int) []int {
+func addWormholes(row []int, rowNum int, freeSpaces []int) []int {
 	var spotOne int = 0
 	var spotTwo int = 0
 	//take the holes that are furthest from each other if borders are in the row, else random columns
@@ -528,6 +525,13 @@ func addWormholes(row, freeSpaces []int) []int {
 	row[spotOne] = Wormhole
 	row[spotTwo] = Wormhole
 
+	for i := 0; i < len(portals); i++ {
+		if portals[i] == nil {
+			portals[i] = &Portal{spotOne, spotTwo, rowNum }
+			break
+		}
+	}
+	currNPortals += 1
 	return row
 }
 
@@ -587,12 +591,12 @@ func shiftPortals() {
 var init_freezing_counter = N_INIT_FREEZING_CYCLES
 var score_incr_counter = 0
 
-func Update() {
+func Update(dt time.Duration) {
 	//Drags the board up
 	if init_freezing_counter > 0 {
 		init_freezing_counter -= 1
 	} else {
-		newRow, containsBarrier := genRandRow(board.offsetLastBarrier)
+		newRow, containsBarrier := genRandRow(board.offsetLastBarrier, BOARD_HEIGHT)
 		board.addRow(newRow, containsBarrier)
 		board.gopherRow--
 		shiftBadgers()
