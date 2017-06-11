@@ -12,7 +12,7 @@ const BOARD_WIDTH int = 25
 const BARRIERS_MIN_ROWS_BETWEEN int = 5
 const P_ROW_HAS_BARRIER float32 = 0.7
 const P_PLACE_BARRIER float32 = 0.3
-const P_WORMWHOLES float32 = 0.10
+const P_WORMHOLES float32 = 0.10
 const P_NEW_BADGER float32 = 0.20
 const MAX_N_BADGERS int = 5
 const MAX_N_PORTALS int = 6
@@ -132,8 +132,6 @@ func deleteBadgersAt(row, col int) {
 		}
 	}
 }
-
-var currNBadgers int = 0
 
 type GameBoard struct {
 	array                      [][]int
