@@ -47,7 +47,7 @@ func checkEventChan() {
 	evenChan := game.GetEventChan()
 	select {
 	case event := <-*evenChan:
-		switch event.Msg {
+		switch event.GetMsg() {
 		case game.MSG_GOPHER_PIPE:
 			atomic.StoreUint32(&state, gray)
 			resetTimer.Reset(time.Second * 2)
@@ -80,7 +80,7 @@ func checkScoreChan() {
 	scoreChan := game.GetScoreUpdateChan()
 	select {
 	case score := <-*scoreChan:
-		atomic.StoreInt32(&currentScore, int32(score.NewScore))
+		atomic.StoreInt32(&currentScore, int32(score.GetNewScore()))
 		break
 	default:
 	}

@@ -85,31 +85,6 @@ const (
 	DeadBadger          = iota
 )
 
-type ScoreUpdate struct {
-	msg       string
-	kind      int // is one of RegularBonus, passedNarrowPassage, barelyEscaped
-	NewScore  int
-	increment int
-}
-
-type TriggeredEffect struct {
-	msg string
-	row int
-	col int
-}
-
-func (te TriggeredEffect) GetMsg() string {
-	return te.msg
-}
-
-func (te TriggeredEffect) GetRow() int {
-	return te.row
-}
-
-func (te TriggeredEffect) GetCol() int {
-	return te.col
-}
-
 func (b *Badger) String() string {
 	res := "row: " + strconv.Itoa(b.currRow) +
 			"\ncol: " + strconv.Itoa(b.currRow) +
@@ -182,12 +157,6 @@ func (board *Board) addRow(newRow []int, hasBarrier bool) {
 	} else {
 		board.offsetLastBarrier += 1
 	}
-}
-
-type GopherCollision struct {
-	Msg string
-	row int
-	col int
 }
 
 func (board *Board) moveGopher(row, col int) *GopherCollision {
