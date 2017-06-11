@@ -15,6 +15,7 @@ const P_PLACE_BARRIER float32 = 0.3
 const P_WORMWHOLES float32 = 0.10
 const P_NEW_BADGER float32 = 0.20
 const MAX_N_BADGERS int = 5
+const MAX_N_PORTALS int = 6
 const BADGER_MAX_VERTICAL_WAY = 40
 const BADGER_STEP_SIZE int = 2
 
@@ -50,7 +51,7 @@ const (
 	Water            int = iota
 	Enemy            int = iota
 	SuperPowerFood   int = iota
-	Wormwhole        int = iota
+	Wormhole         int = iota
 )
 
 const (
@@ -66,6 +67,12 @@ type Badger struct {
 	currCol               int
 	remainingRowsDownward int
 	direction             int
+}
+
+type Portal struct {
+	colOne int
+	colTwo int
+	row    int
 }
 
 const (
@@ -107,7 +114,10 @@ func (b *Badger) String() string {
 	return res
 }
 
+var portals []*Portal = make([]*Portal, MAX_N_PORTALS, MAX_N_PORTALS)
 var badgers []*Badger = make([]*Badger, MAX_N_BADGERS, MAX_N_BADGERS)
+var currNBadgers int = 0
+var currNPortals int = 0
 
 func deleteBadgersAt(row, col int) {
 	for i := 0; i < len(badgers); i++ {
@@ -172,14 +182,14 @@ func (board *GameBoard) moveGopher(row, col int) *GopherCollision {
 			return &GopherCollision{MSG_GOPHER_DROWNED, row, col }
 		case Enemy:
 			return &GopherCollision{MSG_NOM_NOM, row, col }
-		case Wormwhole:
-			var spots []int = getWhormwholesInRow(row)
+		case Wormhole:
+			var p *Portal = getWormholesInGivenRow(row)
 			board.array[row][col] = Tunnel
 			board.gopherCol = col
-			if col == spots[0] {
-				col = spots[1]
+			if col == p.colOne {
+				col = p.colTwo
 			} else {
-				col = spots[0]
+				col = p.colOne
 			}
 
 		default:
@@ -202,7 +212,7 @@ func moveBadgerKeepLeftRight(b *Badger, horizontalStep int) *GopherCollision {
 		board.array[b.currRow][b.currCol] = Tunnel
 		if b.currCol+horizontalStep >= 0 && b.currCol+horizontalStep < BOARD_WIDTH {
 			switch board.GetCell(b.currRow, b.currCol+horizontalStep) {
-			case Tunnel, Earth, Gopher, GopherSuperPower, Enemy, SuperPowerFood:
+			case Tunnel, Earth, Gopher, GopherSuperPower, Enemy, Wormhole, SuperPowerFood:
 				b.currCol = b.currCol + horizontalStep
 
 			default:
@@ -212,12 +222,28 @@ func moveBadgerKeepLeftRight(b *Badger, horizontalStep int) *GopherCollision {
 				}
 			}
 		}
+		if isOnWormhole(b) {
+			moveBatcherThroughPortal(b)
+		}
 		board.array[b.currRow][b.currCol] = Enemy
 		if board.gopherCol == b.currCol && board.gopherRow == b.currRow {
 			return &GopherCollision{MSG_NOM_NOM, b.currRow, b.currCol}
 		}
 	}
 	return nil
+}
+
+func isOnWormhole(b *Badger) bool {
+	return board.GetCell(b.currRow, b.currCol) == Wormhole
+}
+
+func moveBatcherThroughPortal(b *Badger) {
+	var p *Portal = getWormholesInGivenRow(b.currRow)
+	if p.colOne == b.currCol {
+		b.currCol = p.colTwo
+	} else {
+		b.currCol = p.colOne
+	}
 }
 
 func moveBadger(b *Badger) *GopherCollision {
@@ -270,6 +296,11 @@ func moveBadger(b *Badger) *GopherCollision {
 				}
 			}
 		}
+
+		if isOnWormhole(b) {
+			moveBatcherThroughPortal(b)
+		}
+
 		board.array[b.currRow][b.currCol] = Enemy
 		if board.gopherCol == b.currCol && board.gopherRow == b.currRow {
 			return &GopherCollision{MSG_NOM_NOM, b.currRow, b.currCol}
@@ -278,6 +309,16 @@ func moveBadger(b *Badger) *GopherCollision {
 	return nil
 }
 
+func updatePortals() {
+	//repaint all portals in case they were overwritten by a badger or the gopher
+	for i := 0; i < len(portals); i++ {
+		var p *Portal = portals[i]
+		if p != nil {
+			board.array[p.row][p.colOne] = Wormhole
+			board.array[p.row][p.colTwo] = Wormhole
+		}
+	}
+}
 func updateBadgers() *GopherCollision {
 	// delete existing badgers (if close to the edge)
 	for i := 0; i < len(badgers); i++ {
@@ -402,20 +443,14 @@ func getFreeSpotsInGivenRow(row *[]int) []int {
 	return res
 }
 
-func getWhormwholesInRow(row int) []int {
-	return getWhormwholesInGivenRow(board.array[row])
-}
-
-func getWhormwholesInGivenRow(row []int) []int {
-	var spots [] int = make([] int, 2)
-	spotsfound := 0
-	for i := 0; i < len(row); i++ {
-		if row[i] == Wormwhole {
-			spots[spotsfound] = i
-			spotsfound++
+func getWormholesInGivenRow(row int) *Portal {
+	for i := 0; i < len(portals); i++ {
+		var p *Portal = portals[i]
+		if p != nil && p.row == row {
+			return p
 		}
 	}
-	return spots
+	return nil
 }
 
 func newBoard() GameBoard {
@@ -427,14 +462,14 @@ func newBoard() GameBoard {
 										 0 }
 
 	for row := 0; row < BOARD_HEIGHT; row++ {
-		newRow, containsBarrier := genRandRow(board.offsetLastBarrier)
+		newRow, containsBarrier := genRandRow(board.offsetLastBarrier, row)
 		board.addRow(newRow, containsBarrier)
 	}
 	board.array[0][0] = Gopher
 	return board
 }
 
-func genRandRow(offsetLastBarrier int) ([]int, bool) {
+func genRandRow(offsetLastBarrier int, rowNum int) ([]int, bool) {
 	var row []int = make([] int, BOARD_WIDTH)
 
 	for j := 0; j < BOARD_WIDTH; j++ {
@@ -487,36 +522,44 @@ func genRandRow(offsetLastBarrier int) ([]int, bool) {
 		}
 	}
 
-	// place worm wholes
+	// place worm holes
 	var freeSpaces []int = getFreeSpotsInGivenRow(&row)
-	if rand.Float32() <= P_WORMWHOLES && len(freeSpaces) != 1 {
-		row = addWormwholes(row, freeSpaces)
+	if rand.Float32() <= P_WORMHOLES && len(freeSpaces) != 1 && currNPortals < MAX_N_PORTALS {
+		row = addWormholes(row, rowNum, freeSpaces)
 	}
 
 	return row, containsBarrier
 }
 
-func addWormwholes(row, freeSpaces []int) []int {
+func addWormholes(row []int, rowNum int, freeSpaces []int) []int {
 	var spotOne int = 0
 	var spotTwo int = 0
-	//take the wholes that are furthest from each other if borders are in the row, else random columns
+	//take the holes that are furthest from each other if borders are in the row, else random columns
 	if len(freeSpaces) < len(row) {
 		spotOne = freeSpaces[0]
 		spotTwo = freeSpaces[len(freeSpaces)-1]
 	} else if len(freeSpaces) == BOARD_WIDTH {
-		// spawn the first whole inside the first half of the row
+		// spawn the first hole inside the first half of the row
 		spotOne = rand.Intn(BOARD_WIDTH / 3)
 		fmt.Println("0: ", spotOne)
-		// make at least one space between the wholes
+		// make at least one space between the holes
 		for i := 0; i < 1; i++ {
 			spotTwo = rand.Intn(BOARD_WIDTH)
-			if spotTwo-BOARD_WIDTH/3 > spotOne {
+			if spotTwo - BOARD_WIDTH/3 > spotOne {
 				i--
 			}
 		}
 	}
-	row[spotOne] = Wormwhole
-	row[spotTwo] = Wormwhole
+	row[spotOne] = Wormhole
+	row[spotTwo] = Wormhole
+
+	for i := 0; i < len(portals); i++ {
+		if portals[i] == nil {
+			portals[i] = &Portal{spotOne, spotTwo, rowNum }
+			break
+		}
+	}
+	currNPortals += 1
 	return row
 }
 
@@ -560,6 +603,19 @@ func shiftBadgers() {
 	}
 }
 
+func shiftPortals() {
+	for i := 0; i < len(portals); i++ {
+		var p *Portal = portals[i]
+		if p != nil {
+			p.row--
+			if p.row < 0 {
+				portals[i] = nil
+				currNPortals--
+			}
+		}
+	}
+}
+
 var init_freezing_counter = N_INIT_FREEZING_CYCLES
 var score_incr_counter = 0
 
@@ -568,16 +624,18 @@ func Update(dt time.Duration) {
 	if init_freezing_counter > 0 {
 		init_freezing_counter -= 1
 	} else {
-		newRow, containsBarrier := genRandRow(board.offsetLastBarrier)
+		newRow, containsBarrier := genRandRow(board.offsetLastBarrier, BOARD_HEIGHT)
 		board.addRow(newRow, containsBarrier)
 		board.gopherRow--
 		shiftBadgers()
+		shiftPortals()
 		if board.gopherRow < 0 {
 			board.gopherRow = 0
 			viewEventChan <- &GopherCollision{"Gopher got dragged outside!",
 																				board.gopherRow, board.gopherCol}
 		}
 	}
+	updatePortals()
 	res := updateBadgers()
 	if res != nil {
 		viewEventChan <- res

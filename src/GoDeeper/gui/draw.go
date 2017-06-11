@@ -35,7 +35,7 @@ func (c context) GetHeightScale() int {
 	return height / game.BOARD_HEIGHT
 }
 
-func DrawScene(window *glfw.Window) {
+func DrawScene(window *glfw.Window, w int32, h int32) {
 	currentContext.Window = window
 
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -75,8 +75,8 @@ func drawBoard() {
 				break
 			case game.SuperPowerFood:
 				DrawSuperPowerFood(sx, sy)
-				break
-			case game.Wormwhole:
+        break
+      case game.Wormhole:
 				DrawWormwhole(sx, sy)
 				break
 			}
