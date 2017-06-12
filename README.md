@@ -13,7 +13,7 @@ Install Go Bindings
   > go get -u github.com/go-gl/glfw/v3.2/glfw
 ```
 
-The textures are not included in the repo, if you want to try out the game please contact use.
+The textures are not included in the repo, if you want to try out the game please contact us.
 
 Example screen shot.
 ![YouCompleteMe GIF demo](https://github.com/vulder/GoDeeper/blob/master/img/screenshot.png)
