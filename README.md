@@ -14,3 +14,6 @@ Install Go Bindings
 ```
 
 The textures are not included in the repo, if you want to try out the game please contact use.
+
+Example screen shot.
+![YouCompleteMe GIF demo](https://github.com/vulder/GoDeeper/blob/master/img/screenshot.png)
