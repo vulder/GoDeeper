@@ -16,7 +16,7 @@ const P_WORMHOLES float32 = 0.10
 const P_NEW_BADGER float32 = 0.30
 const MAX_N_BADGERS int = 5
 const MAX_N_PORTALS int = 6
-const BADGER_MAX_VERTICAL_WAY = 40
+const BADGER_MAX_VERTICAL_WAY = 100
 const BADGER_STEP_SIZE int = 6
 
 const P_SUPER_POWER_FOOD float32 = 0.07
